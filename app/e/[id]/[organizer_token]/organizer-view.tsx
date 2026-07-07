@@ -8,7 +8,7 @@ import type { AvailabilityStatus, OrganizerEvent } from "../../../../lib/types";
 
 export default function OrganizerView({ event, token }: { event: OrganizerEvent; token: string }) {
   const router = useRouter();
-  const [copyLabel, setCopyLabel] = useState("Copy");
+  const [copiedLink, setCopiedLink] = useState<"public" | "organizer" | null>(null);
   const [busySlot, setBusySlot] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -17,12 +17,16 @@ export default function OrganizerView({ event, token }: { event: OrganizerEvent;
     if (typeof window === "undefined") return `/e/${event.id}`;
     return `${window.location.origin}/e/${event.id}`;
   }, [event.id]);
+  const organizerUrl = useMemo(() => {
+    if (typeof window === "undefined") return `/e/${event.id}/${token}`;
+    return `${window.location.origin}/e/${event.id}/${token}`;
+  }, [event.id, token]);
   const bestIdx = getBestSlotIndex(event.responses, event.slots.length);
 
-  async function copyLink() {
-    await navigator.clipboard.writeText(publicUrl);
-    setCopyLabel("Copied");
-    window.setTimeout(() => setCopyLabel("Copy"), 1800);
+  async function copyLink(kind: "public" | "organizer", url: string) {
+    await navigator.clipboard.writeText(url);
+    setCopiedLink(kind);
+    window.setTimeout(() => setCopiedLink(null), 1800);
   }
 
   async function selectSlot(slotIndex: number) {
@@ -77,14 +81,26 @@ export default function OrganizerView({ event, token }: { event: OrganizerEvent;
         {event.title}
       </h1>
 
+      <div className="link-panel sans">
+        <LinkCard
+          kind="public"
+          label="Shareable participant link"
+          help="Send this link to participants so they can submit or update their availability."
+          url={publicUrl}
+          copied={copiedLink === "public"}
+          onCopy={() => copyLink("public", publicUrl)}
+        />
+        <LinkCard
+          kind="organizer"
+          label="Organizer private link"
+          help="Keep this link for yourself. It opens results, slot selection, CSV exports, and poll deletion."
+          url={organizerUrl}
+          copied={copiedLink === "organizer"}
+          onCopy={() => copyLink("organizer", organizerUrl)}
+        />
+      </div>
+
       <div className="toolbar">
-        <div className="copy-box sans">
-          <span className="copy-url mono">{publicUrl}</span>
-          <button className="button button-secondary" type="button" onClick={copyLink}>
-            <Copy size={15} />
-            {copyLabel}
-          </button>
-        </div>
         <div className="toolbar-actions">
           <a className="button" href={`/api/events/${event.id}/export/all?token=${token}`} download>
             <Download size={15} />
@@ -138,6 +154,36 @@ export default function OrganizerView({ event, token }: { event: OrganizerEvent;
 
       {error ? <p className="error-text sans">{error}</p> : null}
     </section>
+  );
+}
+
+function LinkCard({
+  kind,
+  label,
+  help,
+  url,
+  copied,
+  onCopy,
+}: {
+  kind: "public" | "organizer";
+  label: string;
+  help: string;
+  url: string;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  return (
+    <div className={`link-card ${kind === "organizer" ? "link-card--private" : ""}`}>
+      <div>
+        <p className="link-card__label">{label}</p>
+        <span className="link-card__url mono">{url}</span>
+        <p className="link-card__help">{help}</p>
+      </div>
+      <button className="button button-secondary" type="button" onClick={onCopy}>
+        <Copy size={15} />
+        {copied ? "Copied" : "Copy"}
+      </button>
+    </div>
   );
 }
 

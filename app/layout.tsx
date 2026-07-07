@@ -16,6 +16,7 @@ export default function RootLayout({
       <body>
         <Header />
         <main className="shell">{children}</main>
+        <Footer />
       </body>
     </html>
   );
@@ -31,5 +32,13 @@ function Header() {
         <span className="tagline">a register for finding a time everyone keeps</span>
       </div>
     </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="site-footer sans">
+      This poll was developed by Adalberto Polenghi independently from Politecnico di Milano.
+    </footer>
   );
 }

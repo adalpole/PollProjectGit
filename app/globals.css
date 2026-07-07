@@ -1,18 +1,19 @@
 :root {
-  --paper: #faf9f5;
-  --paper-raised: #fffefb;
-  --ink: #1e2724;
-  --muted: #5b6660;
-  --line: #d8d3c4;
-  --line-soft: #e7e3d6;
-  --primary: #2f4858;
-  --gold: #a87c2a;
-  --gold-soft: #fbf3e3;
+  --paper: #f7fbff;
+  --paper-raised: #ffffff;
+  --ink: #07182f;
+  --muted: #53677f;
+  --line: #c9d9e8;
+  --line-soft: #deebf6;
+  --primary: #102c53;
+  --accent: #4dc9ff;
+  --accent-strong: #0ba4ff;
+  --accent-soft: #e7f7ff;
   --green: #3f6b4f;
-  --amber: #a87c2a;
+  --amber: #0b79b7;
   --red: #a6453b;
-  --disabled: #c7c2b4;
-  --shadow: 0 8px 24px rgb(30 39 36 / 0.08);
+  --disabled: #9db0c2;
+  --shadow: 0 8px 24px rgb(16 44 83 / 0.1);
 }
 
 * {
@@ -67,6 +68,7 @@ a {
 
 .site-header {
   border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, #ffffff 0%, #eff9ff 100%);
 }
 
 .site-header__inner {
@@ -79,6 +81,7 @@ a {
 }
 
 .brand {
+  color: var(--primary);
   text-decoration: none;
   font-size: 26px;
   letter-spacing: 0.2px;
@@ -168,6 +171,11 @@ a {
   text-decoration: none;
 }
 
+.button:hover:not(:disabled),
+a.button:hover {
+  background: #0b2445;
+}
+
 .button:disabled,
 .button[aria-disabled="true"] {
   background: var(--disabled);
@@ -178,6 +186,11 @@ a {
   background: transparent;
   color: var(--primary);
   border: 1px solid var(--line);
+}
+
+.button-secondary:hover:not(:disabled),
+a.button-secondary:hover {
+  background: var(--accent-soft);
 }
 
 .button-danger {
@@ -214,6 +227,12 @@ a {
   border: 1px solid var(--line-soft);
   border-radius: 3px;
   padding: 10px 12px;
+}
+
+.slot-row:focus-within,
+.availability-row:focus-within {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px rgb(77 201 255 / 0.18);
 }
 
 .slot-row input {
@@ -330,7 +349,7 @@ a {
 .toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   margin: 0 0 24px;
 }
@@ -342,20 +361,52 @@ a {
   flex-wrap: wrap;
 }
 
-.copy-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
+.link-panel {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 24px;
 }
 
-.copy-url {
+.link-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  background: var(--paper-raised);
+  border: 1px solid var(--line-soft);
+  border-left: 4px solid var(--accent-strong);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+}
+
+.link-card--private {
+  border-left-color: var(--primary);
+}
+
+.link-card__label {
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.link-card__help {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+  margin: 5px 0 0;
+}
+
+.link-card__url {
+  color: var(--ink);
+  display: block;
+  font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 340px;
-  color: var(--muted);
-  font-size: 12px;
 }
 
 .table-wrap {
@@ -395,12 +446,12 @@ a {
 .results-table .slot-best,
 .results-table .slot-best td,
 .results-table td.slot-best {
-  background: var(--gold-soft);
+  background: var(--accent-soft);
 }
 
 .results-table .slot-confirmed,
 .results-table td.slot-confirmed {
-  background: #f8ead0;
+  background: #d9f2ff;
 }
 
 .slot-header {
@@ -420,8 +471,8 @@ a {
 }
 
 .select-slot[data-selected="true"] {
-  border-color: var(--gold);
-  background: var(--gold);
+  border-color: var(--primary);
+  background: var(--primary);
   color: #fff;
 }
 
@@ -449,6 +500,16 @@ a {
   font-size: 13px;
   line-height: 1.5;
   margin: 0;
+}
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 auto;
+  max-width: 900px;
+  padding: 18px 20px 28px;
 }
 
 .danger-zone {
@@ -483,12 +544,8 @@ a {
     flex-direction: column;
   }
 
-  .copy-box {
-    width: 100%;
-  }
-
-  .copy-url {
-    max-width: calc(100vw - 146px);
+  .link-card {
+    grid-template-columns: 1fr;
   }
 
   .slot-row {
