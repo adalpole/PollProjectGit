@@ -56,6 +56,11 @@ Or push the project to GitHub and import it in Vercel. Add the same two environm
 - No public or participant-facing route selects from `responses`, and no participant-facing response includes other respondents' `email` or `organization`.
 - Anyone with the public poll UUID can submit or resubmit a response for an email address. That is the tradeoff for the requested no-auth participant flow.
 
+## Versioning
+
+- **v1** is the current lightweight release: no accounts, no login, and organizer access through the private organizer link.
+- **v2 candidate**: add a small organizer login so poll creators can recover and manage their private organizer links from one place.
+
 ## Free tier fit
 
 This app uses ordinary Vercel serverless route handlers and Supabase Postgres. It has no cron jobs, background workers, long-running processes, file storage, calendar integrations, or paid Vercel features. Supabase's free project limits, including 500 MB database storage, are more than enough for typical scheduling polls.
