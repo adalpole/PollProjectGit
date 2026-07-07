@@ -148,6 +148,13 @@ a {
   text-transform: uppercase;
 }
 
+.field-help {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+  margin: 8px 0 0;
+}
+
 .text-input {
   width: 100%;
   border: none;
@@ -223,6 +230,17 @@ a.button-secondary:hover {
   font-size: 13px;
   padding: 0;
   text-decoration: none;
+}
+
+.small-action {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 16px 0 0;
+}
+
+.small-action a {
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .slot-list {
@@ -358,6 +376,23 @@ a.button-secondary:hover {
 .notice p {
   margin: 8px 0 0;
   font-size: 14px;
+}
+
+.recover-panel {
+  background: var(--paper-raised);
+  border: 1px solid var(--line-soft);
+  border-left: 4px solid var(--accent-strong);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  padding: 18px 20px 22px;
+}
+
+.recover-copy {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 10px 0 24px;
+  max-width: 620px;
 }
 
 .toolbar {
@@ -536,6 +571,18 @@ a.button-secondary:hover {
 .success-text {
   font-size: 13px;
   margin: 14px 0 0;
+}
+
+.success-banner {
+  background: var(--accent-soft);
+  border: 1px solid var(--line-soft);
+  border-left: 4px solid var(--accent-strong);
+  border-radius: 4px;
+  color: var(--primary);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0 0 18px;
+  padding: 12px 14px;
 }
 
 .error-text {

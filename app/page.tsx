@@ -17,6 +17,7 @@ function newSlot(): EditableSlot {
 
 export default function HomePage() {
   const [title, setTitle] = useState("");
+  const [organizerEmail, setOrganizerEmail] = useState("");
   const [slots, setSlots] = useState<EditableSlot[]>([newSlot()]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -53,6 +54,7 @@ export default function HomePage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           title: title.trim(),
+          organizer_email: organizerEmail.trim() || null,
           slots: validSlots.map(({ date, start, end }) => ({ date, start, end })),
         }),
       });
@@ -65,7 +67,8 @@ export default function HomePage() {
         throw new Error(payload?.error || "Could not create the poll.");
       }
 
-      window.location.assign(`/e/${payload.id}/${payload.organizer_token}`);
+      const recoveryParam = organizerEmail.trim() ? "?recovery=1" : "";
+      window.location.assign(`/e/${payload.id}/${payload.organizer_token}${recoveryParam}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create the poll.");
     } finally {
@@ -89,7 +92,24 @@ export default function HomePage() {
         placeholder="e.g. Partner sync - curriculum review"
       />
 
-      <div style={{ height: 30 }} />
+      <div style={{ height: 22 }} />
+
+      <label className="field-label sans" htmlFor="organizer-email">
+        Your email optional
+      </label>
+      <input
+        id="organizer-email"
+        className="text-input sans"
+        value={organizerEmail}
+        onChange={(event) => setOrganizerEmail(event.target.value)}
+        placeholder="Used only if you lose this poll's organizer link"
+        type="email"
+      />
+      <p className="field-help sans">
+        If you enter an email, Convene can send this poll's private organizer link back to you.
+      </p>
+
+      <div style={{ height: 24 }} />
 
       <label className="field-label sans">Proposed slots</label>
       <div className="slot-list">
@@ -140,6 +160,10 @@ export default function HomePage() {
           {saving ? "Creating..." : "Create poll"}
         </button>
       </div>
+
+      <p className="small-action sans">
+        Lost an organizer link? <a href="/recover">Recover your polls by email</a>.
+      </p>
 
       {error ? <p className="error-text sans">{error}</p> : null}
     </section>

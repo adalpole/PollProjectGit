@@ -7,10 +7,13 @@ export const dynamic = "force-dynamic";
 
 export default async function OrganizerPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string; organizer_token: string }>;
+  searchParams: Promise<{ recovery?: string }>;
 }) {
   const { id, organizer_token: organizerToken } = await params;
+  const { recovery } = await searchParams;
 
   if (!isUuid(id) || !isUuid(organizerToken)) {
     notFound();
@@ -22,5 +25,5 @@ export default async function OrganizerPage({
     notFound();
   }
 
-  return <OrganizerView event={event} token={organizerToken} />;
+  return <OrganizerView event={event} token={organizerToken} recoveryEnabled={recovery === "1"} />;
 }

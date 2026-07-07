@@ -3,6 +3,7 @@ create extension if not exists pgcrypto;
 create table if not exists public.events (
   id uuid primary key default gen_random_uuid(),
   organizer_token uuid not null default gen_random_uuid(),
+  organizer_email text,
   title text not null,
   slots jsonb not null,
   confirmed_slot_index integer,
@@ -12,6 +13,13 @@ create table if not exists public.events (
     confirmed_slot_index is null or confirmed_slot_index >= 0
   )
 );
+
+alter table public.events
+  add column if not exists organizer_email text;
+
+create index if not exists events_organizer_email_idx
+  on public.events (lower(organizer_email))
+  where organizer_email is not null;
 
 create table if not exists public.responses (
   id uuid primary key default gen_random_uuid(),
@@ -62,7 +70,8 @@ revoke all on public.events from anon, authenticated;
 revoke all on public.responses from anon, authenticated;
 
 grant usage on schema public to anon, authenticated;
-grant select (id, title, slots, confirmed_slot_index, created_at), insert (title, slots)
+grant select (id, title, slots, confirmed_slot_index, created_at),
+  insert (title, slots, organizer_email)
   on public.events to anon, authenticated;
 grant insert (event_id, participant_name, organization, email, availability),
   update (participant_name, organization, email, availability)
@@ -78,6 +87,28 @@ begin
   return query
   insert into public.events (title, slots)
   values (btrim(p_title), p_slots)
+  returning events.id, events.organizer_token;
+end;
+$$;
+
+create or replace function public.create_event(
+  p_title text,
+  p_slots jsonb,
+  p_organizer_email text
+)
+returns table(id uuid, organizer_token uuid)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return query
+  insert into public.events (title, slots, organizer_email)
+  values (
+    btrim(p_title),
+    p_slots,
+    nullif(lower(btrim(p_organizer_email)), '')
+  )
   returning events.id, events.organizer_token;
 end;
 $$;
@@ -214,12 +245,14 @@ end;
 $$;
 
 revoke execute on function public.create_event(text, jsonb) from public;
+revoke execute on function public.create_event(text, jsonb, text) from public;
 revoke execute on function public.submit_response(uuid, text, text, text, jsonb) from public;
 revoke execute on function public.get_event_for_organizer(uuid, uuid) from public;
 revoke execute on function public.confirm_event_slot(uuid, uuid, integer) from public;
 revoke execute on function public.delete_event(uuid, uuid) from public;
 
 grant execute on function public.create_event(text, jsonb) to anon, authenticated;
+grant execute on function public.create_event(text, jsonb, text) to anon, authenticated;
 grant execute on function public.submit_response(uuid, text, text, text, jsonb) to anon, authenticated;
 grant execute on function public.get_event_for_organizer(uuid, uuid) to anon, authenticated;
 grant execute on function public.confirm_event_slot(uuid, uuid, integer) to anon, authenticated;

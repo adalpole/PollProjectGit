@@ -6,7 +6,15 @@ import { useMemo, useState } from "react";
 import { formatSlot, getBestSlotIndex, getSlotScore } from "../../../../lib/format";
 import type { AvailabilityStatus, OrganizerEvent } from "../../../../lib/types";
 
-export default function OrganizerView({ event, token }: { event: OrganizerEvent; token: string }) {
+export default function OrganizerView({
+  event,
+  token,
+  recoveryEnabled = false,
+}: {
+  event: OrganizerEvent;
+  token: string;
+  recoveryEnabled?: boolean;
+}) {
   const router = useRouter();
   const [copiedLink, setCopiedLink] = useState<"public" | "organizer" | null>(null);
   const [busySlot, setBusySlot] = useState<number | null>(null);
@@ -80,6 +88,13 @@ export default function OrganizerView({ event, token }: { event: OrganizerEvent;
       <h1 className="page-title" style={{ marginBottom: 16 }}>
         {event.title}
       </h1>
+
+      {recoveryEnabled ? (
+        <p className="success-banner sans">
+          Link recovery is enabled for this poll. We'll be able to email you this organizer link if
+          you lose it.
+        </p>
+      ) : null}
 
       <div className="link-panel sans">
         <LinkCard
