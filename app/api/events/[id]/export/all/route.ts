@@ -26,5 +26,5 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     ]),
   );
 
-  return csvDownloadResponse(`convene-${event.id}-all-respondents.csv`, csv);
+  return csvDownloadResponse(`polipol-${event.id}-all-respondents.csv`, csv);
 }

@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Convene",
-  description: "A self-hosted group scheduling register.",
+  title: "PoliPol",
+  description: "A lightweight group scheduling poll for academic coordination.",
+  icons: {
+    icon: "/polipol-icon.png",
+    apple: "/polipol-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -27,9 +31,10 @@ function Header() {
     <header className="site-header">
       <div className="site-header__inner">
         <a className="brand" href="/">
-          Convene
+          <img className="brand-mark" src="/polipol-icon.png" alt="" aria-hidden="true" />
+          <span>PoliPol</span>
         </a>
-        <span className="version-badge sans">v2</span>
+        <span className="version-badge sans">v3</span>
         <span className="tagline">a register for finding a time everyone keeps</span>
       </div>
     </header>
@@ -39,7 +44,7 @@ function Header() {
 function Footer() {
   return (
     <footer className="site-footer sans">
-      Convene v2. This poll was developed by Adalberto Polenghi independently from
+      PoliPol v3. This poll was developed by Adalberto Polenghi independently from
       Politecnico di Milano.
     </footer>
   );

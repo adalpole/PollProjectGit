@@ -81,10 +81,24 @@ a {
 }
 
 .brand {
+  align-items: center;
   color: var(--primary);
+  display: inline-flex;
+  gap: 9px;
   text-decoration: none;
   font-size: 26px;
   letter-spacing: 0.2px;
+}
+
+.brand-mark {
+  background: #132235;
+  border: 1px solid rgb(77 201 255 / 0.38);
+  border-radius: 8px;
+  box-shadow: 0 0 18px rgb(77 201 255 / 0.22);
+  display: block;
+  height: 36px;
+  object-fit: cover;
+  width: 36px;
 }
 
 .version-badge {

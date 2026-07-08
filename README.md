@@ -1,6 +1,6 @@
-# Convene
+# PoliPol
 
-Convene is a small, self-hosted group scheduling app built with Next.js App Router and Supabase. An organizer creates a poll, shares the public participant link, collects availability without guest accounts, and uses the private organizer URL to select a slot and export contacts. v2 adds optional organizer-link recovery by email without adding login.
+PoliPol is a small, self-hosted group scheduling app built with Next.js App Router and Supabase. An organizer creates a poll, shares the public participant link, collects availability without guest accounts, and uses the private organizer URL to select a slot and export contacts. v3 rebrands the app for `polipol.it` and keeps optional organizer-link recovery by email without adding login.
 
 ## Stack
 
@@ -28,7 +28,8 @@ NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 RESEND_API_KEY=your-resend-api-key
-RESEND_FROM_EMAIL=Convene <onboarding@resend.dev>
+NEXT_PUBLIC_APP_URL=https://polipol.it
+RESEND_FROM_EMAIL=PoliPol <recovery@mail.polipol.it>
 ```
 
 `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, and `RESEND_FROM_EMAIL` are server-only values. Never prefix them with `NEXT_PUBLIC_`. The service role key is used only by `/api/recover` so organizer emails and organizer tokens can be looked up without exposing a public recovery RPC.
@@ -52,9 +53,15 @@ vercel --prod
 
 Or push the project to GitHub and import it in Vercel. Add the environment variables from `.env.example` in Vercel Project Settings before deploying. For production email sending, set `RESEND_FROM_EMAIL` to an address allowed by your Resend account/domain.
 
+For the v3 branding/domain setup outside this repository:
+
+- In **Vercel**, set the production domain to `polipol.it` and add `NEXT_PUBLIC_APP_URL=https://polipol.it`.
+- In **Resend**, verify `mail.polipol.it` and set `RESEND_FROM_EMAIL=PoliPol <recovery@mail.polipol.it>`.
+- In **Supabase**, no brand-specific schema change is required for v3. Keep the v2 migration applied so `organizer_email` exists.
+
 ## Security and data access notes
 
-- Organizer identity is the UUID token in `/e/[id]/[organizer_token]`; there is no login system in v2.
+- Organizer identity is the UUID token in `/e/[id]/[organizer_token]`; there is no login system in v3.
 - Participant submissions go through `POST /api/events/[id]/responses`, which validates organization, email, and availability server-side before writing.
 - Organizer link recovery is optional. If an organizer enters an email when creating a poll, `/recover` can email the matching private organizer links.
 - `/recover` always returns the same generic response for a valid email request, whether or not matching polls exist.
@@ -69,6 +76,7 @@ Or push the project to GitHub and import it in Vercel. Add the environment varia
 
 - **v1** was the first lightweight release: no accounts, no login, and organizer access through the private organizer link.
 - **v2** keeps the no-login model and adds optional organizer-link recovery by email.
+- **v3** rebrands the app as PoliPol, adds the app icon, and aligns production settings around `polipol.it`.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit
@@ -77,4 +85,4 @@ This app uses ordinary Vercel serverless route handlers, Supabase Postgres, and 
 
 ## Data privacy
 
-Convene stores organizer recovery emails, participant names, organizations, emails, and availability. The organizer is responsible for handling exported contact lists according to their institution's data protection policy, including GDPR obligations when respondents are in the EU.
+PoliPol stores organizer recovery emails, participant names, organizations, emails, and availability. The organizer is responsible for handling exported contact lists according to their institution's data protection policy, including GDPR obligations when respondents are in the EU.

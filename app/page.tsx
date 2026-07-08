@@ -106,7 +106,7 @@ export default function HomePage() {
         type="email"
       />
       <p className="field-help sans">
-        If you enter an email, Convene can send this poll's private organizer link back to you.
+        If you enter an email, PoliPol can send this poll's private organizer link back to you.
       </p>
 
       <div style={{ height: 24 }} />

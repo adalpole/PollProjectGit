@@ -53,7 +53,7 @@ export default function RecoverPage() {
         <Mail size={20} color="var(--primary)" />
         <p className="recover-copy sans">
           Enter the organizer email you used when creating a poll. If any polls are tied to that
-          email, Convene will send the private organizer links.
+          email, PoliPol will send the private organizer links.
         </p>
 
         <label className="field-label sans" htmlFor="recovery-email">

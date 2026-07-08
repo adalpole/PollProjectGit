@@ -62,7 +62,7 @@ function buildRecoveryEmail(origin: string, events: RecoveryEvent[]) {
   });
 
   const text = [
-    "Your Convene organizer links:",
+    "Your PoliPol organizer links:",
     "",
     ...links.map((link) => `${link.title}: ${link.url}`),
     "",
@@ -71,7 +71,7 @@ function buildRecoveryEmail(origin: string, events: RecoveryEvent[]) {
 
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.5; color: #07182f;">
-      <h1 style="font-size: 20px; margin: 0 0 14px;">Your Convene organizer links</h1>
+      <h1 style="font-size: 20px; margin: 0 0 14px;">Your PoliPol organizer links</h1>
       <p style="margin: 0 0 16px;">Here are the private organizer links tied to this email address.</p>
       <ul style="padding-left: 20px; margin: 0 0 16px;">
         ${links
@@ -94,7 +94,7 @@ function buildRecoveryEmail(origin: string, events: RecoveryEvent[]) {
 
 async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEvent[]) {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL || "Convene <onboarding@resend.dev>";
+  const from = process.env.RESEND_FROM_EMAIL || "PoliPol <recovery@mail.polipol.it>";
 
   if (!apiKey) {
     throw new Error("Missing RESEND_API_KEY.");
@@ -110,7 +110,7 @@ async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEve
     body: JSON.stringify({
       from,
       to,
-      subject: "Your Convene organizer links",
+      subject: "Your PoliPol organizer links",
       html: email.html,
       text: email.text,
     }),
