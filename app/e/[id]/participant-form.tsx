@@ -126,7 +126,7 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
                   onClick={() => setSlotStatus(index, "yes")}
                 />
                 <StatusButton
-                  label="Maybe"
+                  label="If needed"
                   status="maybe"
                   active={status === "maybe"}
                   onClick={() => setSlotStatus(index, "maybe")}

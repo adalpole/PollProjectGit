@@ -77,6 +77,7 @@ For the v3 branding/domain setup outside this repository:
 - **v1** was the first lightweight release: no accounts, no login, and organizer access through the private organizer link.
 - **v2** keeps the no-login model and adds optional organizer-link recovery by email.
 - **v3** rebrands the app as PoliPol, adds the app icon, and aligns production settings around `polipol.it`.
+- **v3.1** counts each available/if-needed answer once and renames "maybe" to "if needed" in the interface.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit

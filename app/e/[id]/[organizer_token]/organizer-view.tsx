@@ -3,7 +3,7 @@
 import { Check, Circle, Copy, Download, Trash2, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { formatSlot, getBestSlotIndex, getSlotScore } from "../../../../lib/format";
+import { formatSlot, getBestSlotIndex, getSlotAnswerCount } from "../../../../lib/format";
 import type { AvailabilityStatus, OrganizerEvent } from "../../../../lib/types";
 
 export default function OrganizerView({
@@ -155,8 +155,8 @@ export default function OrganizerView({
 
       <div className="export-panel sans">
         <p className="export-note">
-          The exported file marks each person as "available" or "maybe" for the selected slot - use
-          that column to decide who's required vs. optional when you send the invite.
+          The exported file marks each person as "available" or "if needed" for the selected slot -
+          use that column to decide who's required vs. optional when you send the invite.
         </p>
       </div>
 
@@ -275,7 +275,7 @@ function ResultsTable({
           ))}
           <tr>
             <td className="participant-col sans" style={{ fontWeight: 700, fontSize: 12 }}>
-              Score
+              Answers
             </td>
             {event.slots.map((_, index) => {
               const isBest = index === bestIdx;
@@ -285,10 +285,10 @@ function ResultsTable({
                   className={`mark-cell mono ${isBest ? "slot-best" : ""} ${
                     isConfirmed ? "slot-confirmed" : ""
                   }`}
-                  key={`score-${index}`}
+                  key={`answer-count-${index}`}
                   style={{ fontWeight: 700 }}
                 >
-                  {getSlotScore(event.responses, index)}
+                  {getSlotAnswerCount(event.responses, index)}
                 </td>
               );
             })}

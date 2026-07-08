@@ -34,7 +34,7 @@ function Header() {
           <img className="brand-mark" src="/polipol-icon.png" alt="" aria-hidden="true" />
           <span>PoliPol</span>
         </a>
-        <span className="version-badge sans">v3</span>
+        <span className="version-badge sans">v3.1</span>
         <span className="tagline">a register for finding a time everyone keeps</span>
       </div>
     </header>
@@ -44,7 +44,7 @@ function Header() {
 function Footer() {
   return (
     <footer className="site-footer sans">
-      PoliPol v3. This poll was developed by Adalberto Polenghi independently from
+      PoliPol v3.1. This poll was developed by Adalberto Polenghi independently from
       Politecnico di Milano.
     </footer>
   );

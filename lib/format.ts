@@ -23,7 +23,7 @@ export function getBestSlotIndex(responses: Array<{ availability: string[] }>, s
   for (let i = 0; i < slotCount; i += 1) {
     const score = responses.reduce((acc, response) => {
       const value = response.availability[i];
-      return acc + (value === "yes" ? 2 : value === "maybe" ? 1 : 0);
+      return acc + (value === "yes" || value === "maybe" ? 1 : 0);
     }, 0);
 
     if (score > bestScore) {
@@ -35,9 +35,9 @@ export function getBestSlotIndex(responses: Array<{ availability: string[] }>, s
   return bestIdx;
 }
 
-export function getSlotScore(responses: Array<{ availability: string[] }>, slotIndex: number) {
+export function getSlotAnswerCount(responses: Array<{ availability: string[] }>, slotIndex: number) {
   return responses.reduce((acc, response) => {
     const value = response.availability[slotIndex];
-    return acc + (value === "yes" ? 2 : value === "maybe" ? 1 : 0);
+    return acc + (value === "yes" || value === "maybe" ? 1 : 0);
   }, 0);
 }

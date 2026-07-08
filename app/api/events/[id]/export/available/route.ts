@@ -35,7 +35,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       response.participant_name || "",
       response.organization,
       response.email,
-      value === "yes" ? "available" : "maybe",
+      value === "yes" ? "available" : "if needed",
     ]),
   );
 
