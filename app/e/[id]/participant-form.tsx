@@ -185,7 +185,14 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
       </button>
 
       {error ? <p className="error-text sans">{error}</p> : null}
-      {success ? <p className="success-text sans">{success}</p> : null}
+      {success ? (
+        <p className="success-text sans">
+          <span>{success}</span>
+          <span className="success-text__hint">
+            You can change your answers and submit again as long as you keep this page open.
+          </span>
+        </p>
+      ) : null}
     </section>
   );
 }
@@ -217,11 +224,7 @@ function PreferencePanel({ totalResponses }: { totalResponses: number }) {
   return (
     <div className={`preference-panel sans ${totalResponses === 0 ? "preference-panel--empty" : ""}`}>
       <span className="preference-panel__label">Preferences so far</span>
-      <span>
-        {totalResponses > 0
-          ? `${responseLabel}. Counts below show anonymous totals only.`
-          : "No previous preferences yet."}
-      </span>
+      <span>{totalResponses > 0 ? responseLabel : "No previous preferences yet."}</span>
     </div>
   );
 }

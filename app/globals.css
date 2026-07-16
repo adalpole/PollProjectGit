@@ -721,6 +721,12 @@ a.button-secondary:hover {
   color: var(--green);
 }
 
+.success-text__hint {
+  color: var(--muted);
+  display: block;
+  margin-top: 4px;
+}
+
 @media (max-width: 720px) {
   .site-header__inner {
     align-items: flex-start;

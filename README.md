@@ -82,6 +82,7 @@ For the v3 branding/domain setup outside this repository:
 - **v3.2** lets respondents see anonymous previous preference totals for each proposed slot.
 - **v3.2.1** improves those participant-side totals with a compact per-slot donut chart; no additional Supabase migration is required beyond v3.2.
 - **v3.2.2** adjusts the participant donut colors: yes in PoliPol blue, if needed in light green, and no as a white cut-out segment.
+- **v3.2.3** simplifies the preference summary text and tells respondents they can revise answers while the page stays open.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit
