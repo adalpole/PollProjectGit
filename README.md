@@ -80,6 +80,7 @@ For the v3 branding/domain setup outside this repository:
 - **v3** rebrands the app as PoliPol, adds the app icon, and aligns production settings around `polipol.it`.
 - **v3.1** counts each available/if-needed answer once and renames "maybe" to "if needed" in the interface.
 - **v3.2** lets respondents see anonymous previous preference totals for each proposed slot.
+- **v3.2.1** improves those participant-side totals with a compact per-slot donut chart; no additional Supabase migration is required beyond v3.2.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit

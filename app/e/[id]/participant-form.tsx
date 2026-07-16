@@ -151,10 +151,10 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
               <div className="slot-meta">
                 <div className="slot-day">{formatted.day}</div>
                 <div className="slot-time mono">{formatted.time}</div>
-                {responseSummary.total_responses > 0 ? (
-                  <SlotPreference preference={preference} totalResponses={responseSummary.total_responses} />
-                ) : null}
               </div>
+              {responseSummary.total_responses > 0 ? (
+                <SlotPreferenceChart preference={preference} totalResponses={responseSummary.total_responses} />
+              ) : null}
               <div className="status-group">
                 <StatusButton
                   label="Yes"
@@ -226,7 +226,7 @@ function PreferencePanel({ totalResponses }: { totalResponses: number }) {
   );
 }
 
-function SlotPreference({
+function SlotPreferenceChart({
   preference,
   totalResponses,
 }: {
@@ -238,16 +238,51 @@ function SlotPreference({
     preference.if_needed_count === 1
       ? "1 if needed"
       : `${preference.if_needed_count} if needed`;
+  const noLabel = preference.no_count === 1 ? "1 no" : `${preference.no_count} no`;
+  const chartLabel = `${preference.answer_count} of ${totalResponses} respondents chose this slot: ${yesLabel}, ${ifNeededLabel}, ${noLabel}.`;
 
   return (
-    <div className="slot-preference sans">
-      <span>
-        {preference.answer_count}/{totalResponses} chose this
+    <div className="preference-chart sans" aria-label={chartLabel}>
+      <span
+        className="preference-chart__pie"
+        style={{ background: buildPreferenceGradient(preference, totalResponses) }}
+        aria-hidden="true"
+      />
+      <span className="preference-chart__copy">
+        <span className="preference-chart__total">
+          {preference.answer_count}/{totalResponses} chose this
+        </span>
+        <span className="preference-chart__legend" aria-hidden="true">
+          <span>
+            <i className="legend-dot legend-dot--yes" />
+            {yesLabel}
+          </span>
+          <span>
+            <i className="legend-dot legend-dot--maybe" />
+            {ifNeededLabel}
+          </span>
+          <span>
+            <i className="legend-dot legend-dot--no" />
+            {noLabel}
+          </span>
+        </span>
       </span>
-      <span>{yesLabel}</span>
-      <span>{ifNeededLabel}</span>
     </div>
   );
+}
+
+function buildPreferenceGradient(preference: PublicSlotPreference, totalResponses: number) {
+  const total = Math.max(totalResponses, 1);
+  const yesEnd = (preference.yes_count / total) * 100;
+  const ifNeededEnd = ((preference.yes_count + preference.if_needed_count) / total) * 100;
+
+  return [
+    "conic-gradient(",
+    `var(--green) 0 ${yesEnd.toFixed(2)}%, `,
+    `var(--amber) ${yesEnd.toFixed(2)}% ${ifNeededEnd.toFixed(2)}%, `,
+    `var(--red) ${ifNeededEnd.toFixed(2)}% 100%`,
+    ")",
+  ].join("");
 }
 
 function StatusButton({
