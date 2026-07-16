@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { getSupabase } from "../../../lib/supabase";
-import type { PublicEvent } from "../../../lib/types";
+import { loadPublicEvent } from "../../../lib/public-event";
 import { isUuid } from "../../../lib/validation";
 import ParticipantForm from "./participant-form";
 
@@ -13,20 +12,11 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
     notFound();
   }
 
-  const supabase = getSupabase();
-  const { data, error } = await supabase
-    .from("events")
-    .select("id,title,slots,confirmed_slot_index,created_at")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
+  const data = await loadPublicEvent(id);
 
   if (!data) {
     notFound();
   }
 
-  return <ParticipantForm event={data as PublicEvent} />;
+  return <ParticipantForm event={data} />;
 }

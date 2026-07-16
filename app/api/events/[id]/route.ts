@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { loadPublicEvent } from "../../../../lib/public-event";
 import { getSupabase } from "../../../../lib/supabase";
 import { isUuid } from "../../../../lib/validation";
 
@@ -9,15 +10,16 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
 
-  const supabase = getSupabase();
-  const { data, error } = await supabase
-    .from("events")
-    .select("id,title,slots,confirmed_slot_index,created_at")
-    .eq("id", id)
-    .maybeSingle();
+  let data: Awaited<ReturnType<typeof loadPublicEvent>>;
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  try {
+    data = await loadPublicEvent(id);
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ error: "Could not load event." }, { status: 500 });
   }
 
   if (!data) {

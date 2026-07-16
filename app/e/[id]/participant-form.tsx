@@ -1,9 +1,15 @@
 "use client";
 
 import { Check, Circle, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatSlot } from "../../../lib/format";
-import type { AvailabilityStatus, PublicEvent } from "../../../lib/types";
+import { createEmptyResponseSummary, normalizePublicEvent } from "../../../lib/response-summary";
+import type {
+  AvailabilityStatus,
+  PublicEvent,
+  PublicResponseSummary,
+  PublicSlotPreference,
+} from "../../../lib/types";
 
 export default function ParticipantForm({ event }: { event: PublicEvent }) {
   const [name, setName] = useState("");
@@ -15,14 +21,38 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [responseSummary, setResponseSummary] = useState<PublicResponseSummary>(
+    () => event.response_summary ?? createEmptyResponseSummary(event.slots),
+  );
 
   const canSubmit = useMemo(
     () => organization.trim().length > 0 && email.trim().length > 0 && !saving,
     [email, organization, saving],
   );
 
+  const preferencesBySlot = useMemo(
+    () => new Map(responseSummary.slots.map((preference) => [preference.slot_index, preference])),
+    [responseSummary],
+  );
+
+  useEffect(() => {
+    setResponseSummary(event.response_summary ?? createEmptyResponseSummary(event.slots));
+  }, [event.response_summary, event.slots]);
+
   function setSlotStatus(index: number, status: AvailabilityStatus) {
     setAvailability((current) => current.map((value, i) => (i === index ? status : value)));
+  }
+
+  async function refreshResponseSummary() {
+    const response = await fetch(`/api/events/${event.id}`, { cache: "no-store" });
+    const payload = (await response.json().catch(() => null)) as PublicEvent | { error?: string } | null;
+
+    if (!response.ok || !isPublicEvent(payload)) return;
+
+    const nextEvent = normalizePublicEvent(payload);
+    if (nextEvent.response_summary) {
+      setResponseSummary(nextEvent.response_summary);
+    }
   }
 
   async function submit() {
@@ -50,6 +80,7 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
       }
 
       setSuccess("Thanks - your response has been recorded.");
+      await refreshResponseSummary();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not record your response.");
     } finally {
@@ -108,15 +139,21 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
         </div>
       </div>
 
+      <PreferencePanel totalResponses={responseSummary.total_responses} />
+
       <div className="availability-list">
         {event.slots.map((slot, index) => {
           const formatted = formatSlot(slot);
           const status = availability[index];
+          const preference = preferencesBySlot.get(index) ?? createEmptySlotPreference(index);
           return (
             <div className="availability-row" key={`${slot.date}-${slot.start}-${index}`}>
-              <div>
+              <div className="slot-meta">
                 <div className="slot-day">{formatted.day}</div>
                 <div className="slot-time mono">{formatted.time}</div>
+                {responseSummary.total_responses > 0 ? (
+                  <SlotPreference preference={preference} totalResponses={responseSummary.total_responses} />
+                ) : null}
               </div>
               <div className="status-group">
                 <StatusButton
@@ -150,6 +187,66 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
       {error ? <p className="error-text sans">{error}</p> : null}
       {success ? <p className="success-text sans">{success}</p> : null}
     </section>
+  );
+}
+
+function isPublicEvent(payload: PublicEvent | { error?: string } | null): payload is PublicEvent {
+  return Boolean(
+    payload &&
+      "id" in payload &&
+      "title" in payload &&
+      "slots" in payload &&
+      "confirmed_slot_index" in payload,
+  );
+}
+
+function createEmptySlotPreference(index: number): PublicSlotPreference {
+  return {
+    slot_index: index,
+    yes_count: 0,
+    if_needed_count: 0,
+    no_count: 0,
+    answer_count: 0,
+  };
+}
+
+function PreferencePanel({ totalResponses }: { totalResponses: number }) {
+  const responseLabel =
+    totalResponses === 1 ? "1 response so far" : `${totalResponses} responses so far`;
+
+  return (
+    <div className={`preference-panel sans ${totalResponses === 0 ? "preference-panel--empty" : ""}`}>
+      <span className="preference-panel__label">Preferences so far</span>
+      <span>
+        {totalResponses > 0
+          ? `${responseLabel}. Counts below show anonymous totals only.`
+          : "No previous preferences yet."}
+      </span>
+    </div>
+  );
+}
+
+function SlotPreference({
+  preference,
+  totalResponses,
+}: {
+  preference: PublicSlotPreference;
+  totalResponses: number;
+}) {
+  const yesLabel = preference.yes_count === 1 ? "1 yes" : `${preference.yes_count} yes`;
+  const ifNeededLabel =
+    preference.if_needed_count === 1
+      ? "1 if needed"
+      : `${preference.if_needed_count} if needed`;
+
+  return (
+    <div className="slot-preference sans">
+      <span>
+        {preference.answer_count}/{totalResponses} chose this
+      </span>
+      <span>{yesLabel}</span>
+      <span>{ifNeededLabel}</span>
+    </div>
   );
 }
 

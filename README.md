@@ -17,7 +17,7 @@ PoliPol is a small, self-hosted group scheduling app built with Next.js App Rout
 3. Run the full migration in `supabase/migration.sql`.
 4. In Settings -> API, copy the project URL and anon public key.
 
-The migration creates `events` and `responses`, enables RLS, prevents public `select` on `responses`, and exposes organizer-only operations through token-checking `security definer` functions. The participant-facing event queries select only `id`, `title`, `slots`, `confirmed_slot_index`, and `created_at`; they never return `organizer_token`, `organizer_email`, respondent emails, or respondent organizations.
+The migration creates `events` and `responses`, enables RLS, prevents public `select` on `responses`, and exposes organizer-only operations through token-checking `security definer` functions. Participant-facing event queries select only public event fields plus anonymous per-slot response totals; they never return `organizer_token`, `organizer_email`, respondent names, respondent emails, or respondent organizations.
 
 ## Configure locally
 
@@ -58,6 +58,7 @@ For the v3 branding/domain setup outside this repository:
 - In **Vercel**, set the production domain to `polipol.it` and add `NEXT_PUBLIC_APP_URL=https://polipol.it`.
 - In **Resend**, verify `mail.polipol.it` and set `RESEND_FROM_EMAIL=PoliPol <recovery@mail.polipol.it>`.
 - In **Supabase**, no brand-specific schema change is required for v3. Keep the v2 migration applied so `organizer_email` exists.
+- For **v3.2**, run `supabase/v3.2-public-preferences.sql` once in the Supabase SQL editor before or soon after deploying, so participant pages can show anonymous preference totals.
 
 ## Security and data access notes
 
@@ -69,7 +70,7 @@ For the v3 branding/domain setup outside this repository:
 - Both CSV exports are only served by organizer-token-gated routes:
   - `/api/events/[id]/export/all?token=...`
   - `/api/events/[id]/export/available?token=...`
-- No public or participant-facing route selects from `responses`, and no participant-facing response includes `organizer_email`, `organizer_token`, or other respondents' `email` or `organization`.
+- No public or participant-facing route selects raw rows from `responses`, and no participant-facing response includes `organizer_email`, `organizer_token`, or other respondents' names, emails, or organizations. v3.2 exposes only anonymous aggregate counts by slot.
 - Anyone with the public poll UUID can submit or resubmit a response for an email address. That is the tradeoff for the requested no-auth participant flow.
 
 ## Versioning
@@ -78,6 +79,7 @@ For the v3 branding/domain setup outside this repository:
 - **v2** keeps the no-login model and adds optional organizer-link recovery by email.
 - **v3** rebrands the app as PoliPol, adds the app icon, and aligns production settings around `polipol.it`.
 - **v3.1** counts each available/if-needed answer once and renames "maybe" to "if needed" in the interface.
+- **v3.2** lets respondents see anonymous previous preference totals for each proposed slot.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit

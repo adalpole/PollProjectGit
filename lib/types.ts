@@ -12,6 +12,20 @@ export type PublicEvent = {
   slots: Slot[];
   confirmed_slot_index: number | null;
   created_at?: string;
+  response_summary?: PublicResponseSummary;
+};
+
+export type PublicSlotPreference = {
+  slot_index: number;
+  yes_count: number;
+  if_needed_count: number;
+  no_count: number;
+  answer_count: number;
+};
+
+export type PublicResponseSummary = {
+  total_responses: number;
+  slots: PublicSlotPreference[];
 };
 
 export type ResponseRow = {
