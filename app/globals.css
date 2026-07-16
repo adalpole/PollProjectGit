@@ -12,6 +12,9 @@
   --green: #3f6b4f;
   --amber: #0b79b7;
   --red: #a6453b;
+  --chart-yes: #0ba4ff;
+  --chart-if-needed: #9ee6ad;
+  --chart-no: #ffffff;
   --disabled: #9db0c2;
   --shadow: 0 8px 24px rgb(16 44 83 / 0.1);
 }
@@ -437,15 +440,16 @@ a.button-secondary:hover {
 }
 
 .legend-dot--yes {
-  background: var(--green);
+  background: var(--chart-yes);
 }
 
 .legend-dot--maybe {
-  background: var(--amber);
+  background: var(--chart-if-needed);
 }
 
 .legend-dot--no {
-  background: var(--red);
+  background: var(--chart-no);
+  border: 1px solid var(--line);
 }
 
 .status-group {

@@ -278,9 +278,9 @@ function buildPreferenceGradient(preference: PublicSlotPreference, totalResponse
 
   return [
     "conic-gradient(",
-    `var(--green) 0 ${yesEnd.toFixed(2)}%, `,
-    `var(--amber) ${yesEnd.toFixed(2)}% ${ifNeededEnd.toFixed(2)}%, `,
-    `var(--red) ${ifNeededEnd.toFixed(2)}% 100%`,
+    `var(--chart-yes) 0 ${yesEnd.toFixed(2)}%, `,
+    `var(--chart-if-needed) ${yesEnd.toFixed(2)}% ${ifNeededEnd.toFixed(2)}%, `,
+    `var(--chart-no) ${ifNeededEnd.toFixed(2)}% 100%`,
     ")",
   ].join("");
 }
