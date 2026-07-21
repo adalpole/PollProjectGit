@@ -183,6 +183,13 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
       <button className="button" type="button" disabled={!canSubmit} onClick={submit} style={{ marginTop: 22 }}>
         {saving ? "Submitting..." : "Submit response"}
       </button>
+      <p className="privacy-hint sans">
+        By submitting, your response is stored for this poll and visible to the organizer. See the{" "}
+        <a href="/privacy" target="_blank" rel="noreferrer">
+          Privacy policy
+        </a>
+        .
+      </p>
 
       {error ? <p className="error-text sans">{error}</p> : null}
       {success ? (

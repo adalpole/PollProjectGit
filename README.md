@@ -59,6 +59,7 @@ For the v3 branding/domain setup outside this repository:
 - In **Resend**, verify `mail.polipol.it` and set `RESEND_FROM_EMAIL=PoliPol <recovery@mail.polipol.it>`.
 - In **Supabase**, no brand-specific schema change is required for v3. Keep the v2 migration applied so `organizer_email` exists.
 - For **v3.2**, run `supabase/v3.2-public-preferences.sql` once in the Supabase SQL editor before or soon after deploying, so participant pages can show anonymous preference totals.
+- For **v3.3**, configure or forward `privacy@polipol.it`, or edit the policy pages to use a different monitored privacy contact.
 
 ## Security and data access notes
 
@@ -83,6 +84,7 @@ For the v3 branding/domain setup outside this repository:
 - **v3.2.1** improves those participant-side totals with a compact per-slot donut chart; no additional Supabase migration is required beyond v3.2.
 - **v3.2.2** adjusts the participant donut colors: yes in PoliPol blue, if needed in light green, and no as a white cut-out segment.
 - **v3.2.3** simplifies the preference summary text and tells respondents they can revise answers while the page stays open.
+- **v3.3** adds privacy and cookie policy pages, workflow privacy notices, and footer legal links.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit
@@ -91,4 +93,4 @@ This app uses ordinary Vercel serverless route handlers, Supabase Postgres, and 
 
 ## Data privacy
 
-PoliPol stores organizer recovery emails, participant names, organizations, emails, and availability. The organizer is responsible for handling exported contact lists according to their institution's data protection policy, including GDPR obligations when respondents are in the EU.
+PoliPol stores organizer recovery emails, participant names, organizations, emails, and availability. v3.3 adds `/privacy` and `/cookies` pages written to support EU GDPR transparency and data-minimisation principles. Organizers remain responsible for handling exported contact lists according to their institution's data protection policy, including GDPR obligations when respondents are in the EU.

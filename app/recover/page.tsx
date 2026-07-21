@@ -77,6 +77,10 @@ export default function RecoverPage() {
         >
           {sending ? "Sending..." : "Send recovery email"}
         </button>
+        <p className="privacy-hint sans">
+          Recovery requests use your email only to look for organizer links. See the{" "}
+          <a href="/privacy">Privacy policy</a>.
+        </p>
 
         {status ? <p className="success-text sans">{status}</p> : null}
         {error ? <p className="error-text sans">{error}</p> : null}

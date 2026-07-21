@@ -160,6 +160,9 @@ export default function HomePage() {
           {saving ? "Creating..." : "Create poll"}
         </button>
       </div>
+      <p className="privacy-hint sans">
+        Poll data is handled as described in the <a href="/privacy">Privacy policy</a>.
+      </p>
 
       <p className="small-action sans">
         Lost an organizer link? <a href="/recover">Recover your polls by email</a>.
