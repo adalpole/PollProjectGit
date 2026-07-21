@@ -3,7 +3,7 @@ import "./globals.css";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://polipol.it";
 const siteDescription = "Create lightweight scheduling polls, share one link, and pick a time.";
-const socialImage = "/opengraph-image";
+const socialImage = "/og.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
@@ -70,7 +70,7 @@ function Header() {
           <img className="brand-mark" src="/polipol-icon.png" alt="" aria-hidden="true" />
           <span>PoliPol</span>
         </a>
-        <span className="version-badge sans">v3.4</span>
+        <span className="version-badge sans">v3.4.1</span>
         <span className="tagline">a register for finding a time everyone keeps</span>
       </div>
     </header>
@@ -80,7 +80,7 @@ function Header() {
 function Footer() {
   return (
     <footer className="site-footer sans">
-      <span>PoliPol v3.4</span>
+      <span>PoliPol v3.4.1</span>
       <nav className="site-footer__links" aria-label="Legal links">
         <a href="/privacy">Privacy policy</a>
         <a href="/cookies">Cookie policy</a>

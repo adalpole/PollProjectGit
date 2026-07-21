@@ -55,7 +55,7 @@ export async function generateMetadata({
       type: "website",
       images: [
         {
-          url: "/opengraph-image",
+          url: "/og.png",
           width: 1200,
           height: 630,
           alt: "PoliPol scheduling poll preview",
@@ -66,7 +66,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: `${title} | PoliPol`,
       description: pollDescription,
-      images: ["/opengraph-image"],
+      images: ["/og.png"],
     },
   };
 }

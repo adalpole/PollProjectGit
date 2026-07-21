@@ -86,6 +86,7 @@ For the v3 branding/domain setup outside this repository:
 - **v3.2.3** simplifies the preference summary text and tells respondents they can revise answers while the page stays open.
 - **v3.3** adds privacy and cookie policy pages, workflow privacy notices, and footer legal links.
 - **v3.4** adds title templates, Open Graph/Twitter preview metadata, a branded social preview image, dynamic participant-link titles, and noindex metadata for private organizer links.
+- **v3.4.1** switches link previews to a static octopus-based Open Graph image.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit

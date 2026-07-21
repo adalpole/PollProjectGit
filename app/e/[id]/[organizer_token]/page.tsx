@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/opengraph-image",
+        url: "/og.png",
         width: 1200,
         height: 630,
         alt: "PoliPol scheduling poll preview",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Organizer view | PoliPol",
     description: "Private organizer view for a PoliPol scheduling poll.",
-    images: ["/opengraph-image"],
+    images: ["/og.png"],
   },
 };
 
