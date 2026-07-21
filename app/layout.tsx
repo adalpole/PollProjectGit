@@ -1,9 +1,45 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://polipol.it";
+const siteDescription = "Create lightweight scheduling polls, share one link, and pick a time.";
+const socialImage = "/opengraph-image";
+
 export const metadata: Metadata = {
-  title: "PoliPol",
-  description: "A lightweight group scheduling poll for academic coordination.",
+  metadataBase: new URL(appUrl),
+  title: {
+    default: "PoliPol",
+    template: "%s | PoliPol",
+  },
+  description: siteDescription,
+  applicationName: "PoliPol",
+  creator: "PoliPol",
+  publisher: "PoliPol",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "PoliPol",
+    description: siteDescription,
+    url: "/",
+    siteName: "PoliPol",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: socialImage,
+        width: 1200,
+        height: 630,
+        alt: "PoliPol scheduling poll preview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PoliPol",
+    description: siteDescription,
+    images: [socialImage],
+  },
   icons: {
     icon: "/polipol-icon.png",
     apple: "/polipol-icon.png",
@@ -34,7 +70,7 @@ function Header() {
           <img className="brand-mark" src="/polipol-icon.png" alt="" aria-hidden="true" />
           <span>PoliPol</span>
         </a>
-        <span className="version-badge sans">v3.3</span>
+        <span className="version-badge sans">v3.4</span>
         <span className="tagline">a register for finding a time everyone keeps</span>
       </div>
     </header>
@@ -44,7 +80,7 @@ function Header() {
 function Footer() {
   return (
     <footer className="site-footer sans">
-      <span>PoliPol v3.3</span>
+      <span>PoliPol v3.4</span>
       <nav className="site-footer__links" aria-label="Legal links">
         <a href="/privacy">Privacy policy</a>
         <a href="/cookies">Cookie policy</a>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cookie policy | PoliPol",
+  title: "Cookie policy",
   description: "Cookie and tracking information for PoliPol.",
 };
 
