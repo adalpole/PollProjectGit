@@ -6,8 +6,8 @@ PoliPol is a small, self-hosted group scheduling app built with Next.js App Rout
 
 - Next.js 16, React 19, TypeScript (satisfies the Next.js 14+ requirement)
 - Supabase Postgres with `@supabase/supabase-js`
-- Resend transactional email for organizer-link recovery only
-- Vercel Hobby compatible serverless route handlers
+- Resend transactional email for organizer-link recovery and weekly admin digests
+- Vercel Hobby compatible serverless route handlers and one daily cron job
 - Plain CSS using the POLIMI blue/light-blue visual system
 
 ## Set up Supabase
@@ -17,7 +17,7 @@ PoliPol is a small, self-hosted group scheduling app built with Next.js App Rout
 3. Run the full migration in `supabase/migration.sql`.
 4. In Settings -> API, copy the project URL and anon public key.
 
-The migration creates `events` and `responses`, enables RLS, prevents public `select` on `responses`, and exposes organizer-only operations through token-checking `security definer` functions. Participant-facing event queries select only public event fields plus anonymous per-slot response totals; they never return `organizer_token`, `organizer_email`, respondent names, respondent emails, or respondent organizations.
+The migration creates `events`, `responses`, and the private `app_state` maintenance table, enables RLS, prevents public `select` on `responses` and `app_state`, and exposes organizer-only operations through token-checking `security definer` functions. Participant-facing event queries select only public event fields plus anonymous per-slot response totals; they never return `organizer_token`, `organizer_email`, respondent names, respondent emails, or respondent organizations.
 
 ## Configure locally
 
@@ -30,9 +30,11 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 RESEND_API_KEY=your-resend-api-key
 NEXT_PUBLIC_APP_URL=https://polipol.it
 RESEND_FROM_EMAIL=PoliPol <recovery@mail.polipol.it>
+ADMIN_EMAIL=you@example.com
+CRON_SECRET=generate-a-random-string-at-least-16-characters
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, and `RESEND_FROM_EMAIL` are server-only values. Never prefix them with `NEXT_PUBLIC_`. The service role key is used only by `/api/recover` so organizer emails and organizer tokens can be looked up without exposing a public recovery RPC.
+`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `ADMIN_EMAIL`, and `CRON_SECRET` are server-only values. Never prefix them with `NEXT_PUBLIC_`. The service role key is used by `/api/recover` and `/api/keepalive` so private lookup and aggregate maintenance work stay server-side.
 
 Install and run:
 
@@ -51,7 +53,7 @@ Use either flow:
 vercel --prod
 ```
 
-Or push the project to GitHub and import it in Vercel. Add the environment variables from `.env.example` in Vercel Project Settings before deploying. For production email sending, set `RESEND_FROM_EMAIL` to an address allowed by your Resend account/domain.
+Or push the project to GitHub and import it in Vercel. Add the environment variables from `.env.example` in Vercel Project Settings before deploying. For production email sending, set `RESEND_FROM_EMAIL` to an address allowed by your Resend account/domain. `CRON_SECRET` should be a random value of at least 16 characters; Vercel automatically sends it to `/api/keepalive` as the `Authorization` header when the cron job runs.
 
 For the v3 branding/domain setup outside this repository:
 
@@ -60,6 +62,7 @@ For the v3 branding/domain setup outside this repository:
 - In **Supabase**, no brand-specific schema change is required for v3. Keep the v2 migration applied so `organizer_email` exists.
 - For **v3.2**, run `supabase/v3.2-public-preferences.sql` once in the Supabase SQL editor before or soon after deploying, so participant pages can show anonymous preference totals.
 - For **v3.3**, configure or forward `privacy@polipol.it`, or edit the policy pages to use a different monitored privacy contact.
+- For **v3.5**, run `supabase/v3.5-keepalive-digest.sql` once in the Supabase SQL editor before or soon after deploying. Then add `ADMIN_EMAIL` and `CRON_SECRET` in Vercel Project Settings -> Environment Variables. The daily cron schedule is defined in `vercel.json`.
 
 ## Security and data access notes
 
@@ -68,6 +71,7 @@ For the v3 branding/domain setup outside this repository:
 - Organizer link recovery is optional. If an organizer enters an email when creating a poll, `/recover` can email the matching private organizer links.
 - `/recover` always returns the same generic response for a valid email request, whether or not matching polls exist.
 - `/recover` is rate-limited in memory to reduce abuse, and it uses the server-only Supabase service role key plus Resend API key.
+- `/api/keepalive` only accepts Vercel Cron requests with `Authorization: Bearer CRON_SECRET`. It uses the service role key, reads only aggregate counts, and sends the weekly digest to `ADMIN_EMAIL`.
 - Both CSV exports are only served by organizer-token-gated routes:
   - `/api/events/[id]/export/all?token=...`
   - `/api/events/[id]/export/available?token=...`
@@ -87,12 +91,13 @@ For the v3 branding/domain setup outside this repository:
 - **v3.3** adds privacy and cookie policy pages, workflow privacy notices, and footer legal links.
 - **v3.4** adds title templates, Open Graph/Twitter preview metadata, a branded social preview image, dynamic participant-link titles, and noindex metadata for private organizer links.
 - **v3.4.1** switches link previews to a static octopus-based Open Graph image.
+- **v3.5** adds a protected daily Vercel Cron keepalive route for Supabase Free projects and a weekly aggregate usage digest by email.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit
 
-This app uses ordinary Vercel serverless route handlers, Supabase Postgres, and Resend transactional email. It has no cron jobs, background workers, long-running processes, file storage, calendar integrations, or paid Vercel features. Supabase's free project limits, including 500 MB database storage, are more than enough for typical scheduling polls.
+This app uses ordinary Vercel serverless route handlers, Supabase Postgres, Resend transactional email, and one daily Vercel Cron job. The cron job makes a cheap Supabase query once per day to generate user database activity and sends a weekly aggregate digest. It has no background workers, long-running processes, file storage, calendar integrations, or paid Vercel features. Supabase's free project limits, including 500 MB database storage, are more than enough for typical scheduling polls.
 
 ## Data privacy
 
-PoliPol stores organizer recovery emails, participant names, organizations, emails, and availability. v3.3 adds `/privacy` and `/cookies` pages written to support EU GDPR transparency and data-minimisation principles. Organizers remain responsible for handling exported contact lists according to their institution's data protection policy, including GDPR obligations when respondents are in the EU.
+PoliPol stores organizer recovery emails, participant names, organizations, emails, and availability. v3.3 adds `/privacy` and `/cookies` pages written to support EU GDPR transparency and data-minimisation principles. The weekly admin digest contains aggregate counts only, not participant names, emails, organizations, or availability details. Organizers remain responsible for handling exported contact lists according to their institution's data protection policy, including GDPR obligations when respondents are in the EU.

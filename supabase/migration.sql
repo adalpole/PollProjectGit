@@ -33,8 +33,19 @@ create table if not exists public.responses (
   constraint responses_availability_array check (jsonb_typeof(availability) = 'array')
 );
 
+create table if not exists public.app_state (
+  id boolean primary key default true,
+  last_digest_sent_at timestamptz,
+  constraint app_state_single_row check (id)
+);
+
+insert into public.app_state (id)
+values (true)
+on conflict (id) do nothing;
+
 alter table public.events enable row level security;
 alter table public.responses enable row level security;
+alter table public.app_state enable row level security;
 
 drop policy if exists "events_public_select" on public.events;
 drop policy if exists "events_public_insert" on public.events;
@@ -68,6 +79,8 @@ with check (true);
 
 revoke all on public.events from anon, authenticated;
 revoke all on public.responses from anon, authenticated;
+revoke all on table public.app_state from public;
+revoke all on table public.app_state from anon, authenticated;
 
 grant usage on schema public to anon, authenticated;
 grant select (id, title, slots, confirmed_slot_index, created_at),
@@ -76,6 +89,7 @@ grant select (id, title, slots, confirmed_slot_index, created_at),
 grant insert (event_id, participant_name, organization, email, availability),
   update (participant_name, organization, email, availability)
   on public.responses to anon, authenticated;
+grant select, insert, update on table public.app_state to service_role;
 
 create or replace function public.create_event(p_title text, p_slots jsonb)
 returns table(id uuid, organizer_token uuid)
