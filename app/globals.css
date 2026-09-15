@@ -553,6 +553,56 @@ a.button-secondary:hover {
   flex-wrap: wrap;
 }
 
+.download-menu {
+  position: relative;
+}
+
+.download-menu__trigger {
+  list-style: none;
+}
+
+.download-menu__trigger::-webkit-details-marker {
+  display: none;
+}
+
+.download-menu__chevron {
+  transition: transform 0.16s ease;
+}
+
+.download-menu[open] .download-menu__chevron {
+  transform: rotate(180deg);
+}
+
+.download-menu__content {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 2px;
+  min-width: 170px;
+  padding: 5px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+}
+
+.download-menu__content a {
+  border-radius: 3px;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 10px;
+  text-decoration: none;
+}
+
+.download-menu__content a:hover,
+.download-menu__content a:focus {
+  background: var(--accent-soft);
+  outline: none;
+}
+
 .link-panel {
   display: grid;
   gap: 10px;
@@ -825,6 +875,17 @@ a.button-secondary:hover {
   .toolbar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .download-menu,
+  .download-menu__trigger {
+    width: 100%;
+  }
+
+  .download-menu__content {
+    left: 0;
+    right: auto;
+    width: 100%;
   }
 
   .link-card {

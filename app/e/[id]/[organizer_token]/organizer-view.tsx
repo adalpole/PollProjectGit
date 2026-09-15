@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Circle, Copy, Download, Trash2, Users, X } from "lucide-react";
+import { Check, ChevronDown, Circle, Copy, Download, Trash2, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { formatSlot, getBestSlotIndex, getSlotAnswerCount } from "../../../../lib/format";
@@ -108,7 +108,7 @@ export default function OrganizerView({
         <LinkCard
           kind="organizer"
           label="Organizer private link"
-          help="Keep this link for yourself. It opens results, slot selection, CSV exports, and poll deletion."
+          help="Keep this link for yourself. It opens results, slot selection, downloads, and poll deletion."
           url={organizerUrl}
           copied={copiedLink === "organizer"}
           onCopy={() => copyLink("organizer", organizerUrl)}
@@ -117,24 +117,20 @@ export default function OrganizerView({
 
       <div className="toolbar">
         <div className="toolbar-actions">
-          <a className="button" href={`/api/events/${event.id}/export/all?token=${token}`} download>
-            <Download size={15} />
-            Download all respondents
-          </a>
+          <DownloadMenu
+            label="Download all respondents"
+            baseUrl={`/api/events/${event.id}/export/all?token=${token}`}
+          />
           {event.confirmed_slot_index === null ? (
             <button className="button" type="button" disabled>
               <Download size={15} />
               Download available for selected slot
             </button>
           ) : (
-            <a
-              className="button"
-              href={`/api/events/${event.id}/export/available?token=${token}`}
-              download
-            >
-              <Download size={15} />
-              Download available for selected slot
-            </a>
+            <DownloadMenu
+              label="Download available for selected slot"
+              baseUrl={`/api/events/${event.id}/export/available?token=${token}`}
+            />
           )}
         </div>
       </div>
@@ -169,6 +165,28 @@ export default function OrganizerView({
 
       {error ? <p className="error-text sans">{error}</p> : null}
     </section>
+  );
+}
+
+function DownloadMenu({ label, baseUrl }: { label: string; baseUrl: string }) {
+  const separator = baseUrl.includes("?") ? "&" : "?";
+
+  return (
+    <details className="download-menu">
+      <summary className="button download-menu__trigger">
+        <Download size={15} />
+        {label}
+        <ChevronDown className="download-menu__chevron" size={14} aria-hidden="true" />
+      </summary>
+      <div className="download-menu__content sans" role="menu">
+        <a href={`${baseUrl}${separator}format=csv`} download role="menuitem">
+          CSV
+        </a>
+        <a href={`${baseUrl}${separator}format=xlsx`} download role="menuitem">
+          Excel (.xlsx)
+        </a>
+      </div>
+    </details>
   );
 }
 
