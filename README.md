@@ -95,6 +95,7 @@ For the v3 branding/domain setup outside this repository:
 - **v3.5** adds a protected daily Vercel Cron keepalive route for Supabase Free projects and a weekly aggregate usage digest by email.
 - **v3.6** adds organizer download menus with CSV and Excel `.xlsx` options.
 - **v3.7** adds a "Calendar to be shared" `.ics` download for the confirmed slot.
+- **v3.8** warns participants when the organizer has already selected a slot while still allowing late responses.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit

@@ -70,7 +70,7 @@ function Header() {
           <img className="brand-mark" src="/polipol-icon.png" alt="" aria-hidden="true" />
           <span>PoliPol</span>
         </a>
-        <span className="version-badge sans">v3.7</span>
+        <span className="version-badge sans">v3.8</span>
         <span className="tagline">a register for finding a time everyone keeps</span>
       </div>
     </header>
@@ -80,7 +80,7 @@ function Header() {
 function Footer() {
   return (
     <footer className="site-footer sans">
-      <span>PoliPol v3.7</span>
+      <span>PoliPol v3.8</span>
       <nav className="site-footer__links" aria-label="Legal links">
         <a href="/privacy">Privacy policy</a>
         <a href="/cookies">Cookie policy</a>

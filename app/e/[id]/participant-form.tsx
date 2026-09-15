@@ -97,6 +97,8 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
         Add your availability for the proposed slots.
       </p>
 
+      <ConfirmedSlotNotice event={event} />
+
       <div className="respond-fields">
         <div>
           <label className="field-label sans" htmlFor="name">
@@ -201,6 +203,30 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
         </p>
       ) : null}
     </section>
+  );
+}
+
+function ConfirmedSlotNotice({ event }: { event: PublicEvent }) {
+  if (event.confirmed_slot_index === null) {
+    return null;
+  }
+
+  const selectedSlot = event.slots[event.confirmed_slot_index];
+
+  if (!selectedSlot) {
+    return null;
+  }
+
+  const formatted = formatSlot(selectedSlot);
+
+  return (
+    <div className="confirmed-slot-notice sans">
+      <span className="confirmed-slot-notice__label">Slot selected</span>
+      <span>
+        The organizer has selected {formatted.day}, {formatted.time}. You can still submit
+        availability, but the meeting may already be scheduled.
+      </span>
+    </div>
   );
 }
 
