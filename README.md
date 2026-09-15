@@ -8,7 +8,7 @@ PoliPol is a small, self-hosted group scheduling app built with Next.js App Rout
 - Supabase Postgres with `@supabase/supabase-js`
 - Resend transactional email for organizer-link recovery and weekly admin digests
 - Vercel Hobby compatible serverless route handlers and one daily cron job
-- CSV and Excel `.xlsx` organizer downloads
+- CSV, Excel `.xlsx`, and calendar `.ics` organizer downloads
 - Plain CSS using the POLIMI blue/light-blue visual system
 
 ## Set up Supabase
@@ -73,7 +73,7 @@ For the v3 branding/domain setup outside this repository:
 - `/recover` always returns the same generic response for a valid email request, whether or not matching polls exist.
 - `/recover` is rate-limited in memory to reduce abuse, and it uses the server-only Supabase service role key plus Resend API key.
 - `/api/keepalive` only accepts Vercel Cron requests with `Authorization: Bearer CRON_SECRET`. It uses the service role key, reads only aggregate counts, and sends the weekly digest to `ADMIN_EMAIL`.
-- Both organizer downloads are served only by organizer-token-gated routes and support CSV by default or Excel with `format=xlsx`:
+- Organizer downloads are served only by organizer-token-gated routes. Both routes support CSV by default or Excel with `format=xlsx`; the selected-slot route also supports a calendar file with `format=ics` after a slot has been confirmed:
   - `/api/events/[id]/export/all?token=...`
   - `/api/events/[id]/export/available?token=...`
 - No public or participant-facing route selects raw rows from `responses`, and no participant-facing response includes `organizer_email`, `organizer_token`, or other respondents' names, emails, or organizations. v3.2 exposes only anonymous aggregate counts by slot.
@@ -94,6 +94,7 @@ For the v3 branding/domain setup outside this repository:
 - **v3.4.1** switches link previews to a static octopus-based Open Graph image.
 - **v3.5** adds a protected daily Vercel Cron keepalive route for Supabase Free projects and a weekly aggregate usage digest by email.
 - **v3.6** adds organizer download menus with CSV and Excel `.xlsx` options.
+- **v3.7** adds a "Calendar to be shared" `.ics` download for the confirmed slot.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit

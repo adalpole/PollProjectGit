@@ -130,6 +130,7 @@ export default function OrganizerView({
             <DownloadMenu
               label="Download available for selected slot"
               baseUrl={`/api/events/${event.id}/export/available?token=${token}`}
+              includeCalendar
             />
           )}
         </div>
@@ -168,7 +169,15 @@ export default function OrganizerView({
   );
 }
 
-function DownloadMenu({ label, baseUrl }: { label: string; baseUrl: string }) {
+function DownloadMenu({
+  label,
+  baseUrl,
+  includeCalendar = false,
+}: {
+  label: string;
+  baseUrl: string;
+  includeCalendar?: boolean;
+}) {
   const separator = baseUrl.includes("?") ? "&" : "?";
 
   return (
@@ -185,6 +194,11 @@ function DownloadMenu({ label, baseUrl }: { label: string; baseUrl: string }) {
         <a href={`${baseUrl}${separator}format=xlsx`} download role="menuitem">
           Excel (.xlsx)
         </a>
+        {includeCalendar ? (
+          <a href={`${baseUrl}${separator}format=ics`} download role="menuitem">
+            Calendar to be shared
+          </a>
+        ) : null}
       </div>
     </details>
   );
