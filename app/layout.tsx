@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AppShell } from "./site-chrome";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://polipol.it";
 const siteDescription = "Create lightweight scheduling polls, share one link, and pick a time.";
@@ -54,37 +55,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Header />
-        <main className="shell">{children}</main>
-        <Footer />
+        <AppShell>{children}</AppShell>
       </body>
     </html>
-  );
-}
-
-function Header() {
-  return (
-    <header className="site-header">
-      <div className="site-header__inner">
-        <a className="brand" href="/">
-          <img className="brand-mark" src="/polipol-icon.png" alt="" aria-hidden="true" />
-          <span>PoliPol</span>
-        </a>
-        <span className="version-badge sans">v3.8.1</span>
-        <span className="tagline">a register for finding a time everyone keeps</span>
-      </div>
-    </header>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="site-footer sans">
-      <span>PoliPol v3.8.1</span>
-      <nav className="site-footer__links" aria-label="Legal links">
-        <a href="/privacy">Privacy policy</a>
-        <a href="/cookies">Cookie policy</a>
-      </nav>
-    </footer>
   );
 }

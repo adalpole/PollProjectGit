@@ -4,6 +4,7 @@ import { Check, ChevronDown, Circle, Copy, Download, Trash2, Users, X } from "lu
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { formatSlot, getBestSlotIndex, getSlotAnswerCount } from "../../../../lib/format";
+import { localizeApiError, useLanguage } from "../../../../lib/i18n";
 import type { AvailabilityStatus, OrganizerEvent } from "../../../../lib/types";
 
 export default function OrganizerView({
@@ -15,6 +16,7 @@ export default function OrganizerView({
   token: string;
   recoveryEnabled?: boolean;
 }) {
+  const { language, t } = useLanguage();
   const router = useRouter();
   const [copiedLink, setCopiedLink] = useState<"public" | "organizer" | null>(null);
   const [busySlot, setBusySlot] = useState<number | null>(null);
@@ -49,18 +51,18 @@ export default function OrganizerView({
       });
       const payload = (await response.json().catch(() => null)) as { error?: string } | null;
       if (!response.ok) {
-        throw new Error(payload?.error || "Could not select that slot.");
+        throw new Error(localizeApiError(payload?.error, language, t("errorSelectSlot")));
       }
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not select that slot.");
+      setError(err instanceof Error ? err.message : t("errorSelectSlot"));
     } finally {
       setBusySlot(null);
     }
   }
 
   async function deletePoll() {
-    if (!window.confirm("Delete this poll and all responses?")) return;
+    if (!window.confirm(t("deleteConfirm"))) return;
 
     setDeleting(true);
     setError("");
@@ -73,42 +75,41 @@ export default function OrganizerView({
       });
       const payload = (await response.json().catch(() => null)) as { error?: string } | null;
       if (!response.ok) {
-        throw new Error(payload?.error || "Could not delete the poll.");
+        throw new Error(localizeApiError(payload?.error, language, t("errorDeletePoll")));
       }
       window.location.assign("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not delete the poll.");
+      setError(err instanceof Error ? err.message : t("errorDeletePoll"));
       setDeleting(false);
     }
   }
 
   return (
     <section className="section fadein">
-      <p className="page-kicker sans">Organizer view</p>
+      <p className="page-kicker sans">{t("organizerView")}</p>
       <h1 className="page-title" style={{ marginBottom: 16 }}>
         {event.title}
       </h1>
 
       {recoveryEnabled ? (
         <p className="success-banner sans">
-          Link recovery is enabled for this poll. We'll be able to email you this organizer link if
-          you lose it.
+          {t("recoveryEnabled")}
         </p>
       ) : null}
 
       <div className="link-panel sans">
         <LinkCard
           kind="public"
-          label="Shareable participant link"
-          help="Send this link to participants so they can submit or update their availability."
+          label={t("participantLink")}
+          help={t("participantLinkHelp")}
           url={publicUrl}
           copied={copiedLink === "public"}
           onCopy={() => copyLink("public", publicUrl)}
         />
         <LinkCard
           kind="organizer"
-          label="Organizer private link"
-          help="Keep this link for yourself. It opens results, slot selection, downloads, and poll deletion."
+          label={t("organizerLink")}
+          help={t("organizerLinkHelp")}
           url={organizerUrl}
           copied={copiedLink === "organizer"}
           onCopy={() => copyLink("organizer", organizerUrl)}
@@ -118,18 +119,18 @@ export default function OrganizerView({
       <div className="toolbar">
         <div className="toolbar-actions">
           <DownloadMenu
-            label="Download all respondents"
-            baseUrl={`/api/events/${event.id}/export/all?token=${token}`}
+            label={t("downloadAll")}
+            baseUrl={`/api/events/${event.id}/export/all?token=${token}&lang=${language}`}
           />
           {event.confirmed_slot_index === null ? (
             <button className="button" type="button" disabled>
               <Download size={15} />
-              Download available for selected slot
+              {t("downloadSelected")}
             </button>
           ) : (
             <DownloadMenu
-              label="Download available for selected slot"
-              baseUrl={`/api/events/${event.id}/export/available?token=${token}`}
+              label={t("downloadSelected")}
+              baseUrl={`/api/events/${event.id}/export/available?token=${token}&lang=${language}`}
               includeCalendar
             />
           )}
@@ -139,7 +140,7 @@ export default function OrganizerView({
       {event.responses.length === 0 ? (
         <div className="notice">
           <Users size={20} style={{ opacity: 0.6 }} />
-          <p className="sans">No responses yet. Share the link to start collecting availability.</p>
+          <p className="sans">{t("noResponses")}</p>
         </div>
       ) : (
         <ResultsTable
@@ -152,15 +153,14 @@ export default function OrganizerView({
 
       <div className="export-panel sans">
         <p className="export-note">
-          The exported file marks each person as "available" or "if needed" for the selected slot -
-          use that column to decide who's required vs. optional when you send the invite.
+          {t("exportNote")}
         </p>
       </div>
 
       <div className="danger-zone sans">
         <button className="button button-danger" type="button" onClick={deletePoll} disabled={deleting}>
           <Trash2 size={15} />
-          {deleting ? "Deleting..." : "Delete poll"}
+          {deleting ? t("deleting") : t("deletePoll")}
         </button>
       </div>
 
@@ -178,6 +178,7 @@ function DownloadMenu({
   baseUrl: string;
   includeCalendar?: boolean;
 }) {
+  const { t } = useLanguage();
   const separator = baseUrl.includes("?") ? "&" : "?";
 
   return (
@@ -196,7 +197,7 @@ function DownloadMenu({
         </a>
         {includeCalendar ? (
           <a href={`${baseUrl}${separator}format=ics`} download role="menuitem">
-            Calendar to be shared
+            {t("calendarShare")}
           </a>
         ) : null}
       </div>
@@ -219,6 +220,7 @@ function LinkCard({
   copied: boolean;
   onCopy: () => void;
 }) {
+  const { t } = useLanguage();
   return (
     <div className={`link-card ${kind === "organizer" ? "link-card--private" : ""}`}>
       <div>
@@ -228,7 +230,7 @@ function LinkCard({
       </div>
       <button className="button button-secondary" type="button" onClick={onCopy}>
         <Copy size={15} />
-        {copied ? "Copied" : "Copy"}
+        {copied ? t("copied") : t("copy")}
       </button>
     </div>
   );
@@ -245,14 +247,15 @@ function ResultsTable({
   busySlot: number | null;
   onSelectSlot: (slotIndex: number) => void;
 }) {
+  const { locale, t } = useLanguage();
   return (
     <div className="table-wrap">
       <table className="results-table">
         <thead>
           <tr>
-            <th className="participant-col sans">Participant</th>
+            <th className="participant-col sans">{t("participant")}</th>
             {event.slots.map((slot, index) => {
-              const formatted = formatSlot(slot);
+              const formatted = formatSlot(slot, locale);
               const isBest = index === bestIdx;
               const isConfirmed = index === event.confirmed_slot_index;
               return (
@@ -274,7 +277,7 @@ function ResultsTable({
                       disabled={busySlot !== null}
                       onClick={() => onSelectSlot(index)}
                     >
-                      {busySlot === index ? "Selecting..." : isConfirmed ? "Selected" : "Select this slot"}
+                      {busySlot === index ? t("selecting") : isConfirmed ? t("selected") : t("selectSlot")}
                     </button>
                   </div>
                 </th>
@@ -286,7 +289,7 @@ function ResultsTable({
           {event.responses.map((response) => (
             <tr key={response.id || response.email}>
               <td className="participant-col sans">
-                {response.participant_name || "Anonymous"}
+                {response.participant_name || t("anonymous")}
                 <span className="participant-meta">{response.organization}</span>
               </td>
               {event.slots.map((_, index) => {
@@ -307,7 +310,7 @@ function ResultsTable({
           ))}
           <tr>
             <td className="participant-col sans" style={{ fontWeight: 700, fontSize: 12 }}>
-              Answers
+              {t("answers")}
             </td>
             {event.slots.map((_, index) => {
               const isBest = index === bestIdx;

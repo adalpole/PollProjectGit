@@ -5,6 +5,7 @@ type CalendarEventInput = {
   title: string;
   slot: Slot;
   publicUrl: string;
+  language?: "en" | "it";
 };
 
 function escapeIcsText(value: string) {
@@ -36,11 +37,11 @@ function toIcsLocalDateTime(date: string, time: string) {
   return `${date.replace(/-/g, "")}T${time.replace(":", "")}00`;
 }
 
-export function buildCalendarFile({ id, title, slot, publicUrl }: CalendarEventInput) {
+export function buildCalendarFile({ id, title, slot, publicUrl, language = "en" }: CalendarEventInput) {
   const description = [
-    "Confirmed slot from PoliPol.",
+    language === "it" ? "Fascia confermata da PoliPol." : "Confirmed slot from PoliPol.",
     "",
-    `Participant link: ${publicUrl}`,
+    `${language === "it" ? "Link partecipanti" : "Participant link"}: ${publicUrl}`,
   ].join("\n");
   const lines = [
     "BEGIN:VCALENDAR",

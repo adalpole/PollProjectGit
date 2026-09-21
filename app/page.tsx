@@ -2,6 +2,7 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { localizeApiError, useLanguage } from "../lib/i18n";
 import type { Slot } from "../lib/types";
 
 type EditableSlot = Slot & { id: string };
@@ -24,6 +25,7 @@ function newSlot(): EditableSlot {
 }
 
 export default function HomePage() {
+  const { language, t } = useLanguage();
   const [title, setTitle] = useState("");
   const [organizerEmail, setOrganizerEmail] = useState("");
   const [slots, setSlots] = useState<EditableSlot[]>([newSlot()]);
@@ -72,13 +74,13 @@ export default function HomePage() {
         | null;
 
       if (!response.ok || !payload?.id || !payload.organizer_token) {
-        throw new Error(payload?.error || "Could not create the poll.");
+        throw new Error(localizeApiError(payload?.error, language, t("errorCreatePoll")));
       }
 
       const recoveryParam = organizerEmail.trim() ? "?recovery=1" : "";
       window.location.assign(`/e/${payload.id}/${payload.organizer_token}${recoveryParam}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not create the poll.");
+      setError(err instanceof Error ? err.message : t("errorCreatePoll"));
     } finally {
       setSaving(false);
     }
@@ -86,51 +88,51 @@ export default function HomePage() {
 
   return (
     <section className="section fadein">
-      <p className="page-kicker sans">Create a poll</p>
-      <h1 className="page-title">Propose a meeting</h1>
+      <p className="page-kicker sans">{t("createPollKicker")}</p>
+      <h1 className="page-title">{t("proposeMeeting")}</h1>
 
       <label className="field-label sans" htmlFor="title">
-        Title
+        {t("title")}
       </label>
       <input
         id="title"
         className="text-input"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
-        placeholder="e.g. Partner sync - curriculum review"
+        placeholder={t("titlePlaceholder")}
       />
 
       <div style={{ height: 22 }} />
 
       <label className="field-label sans" htmlFor="organizer-email">
-        Your email optional
+        {t("organizerEmailOptional")}
       </label>
       <input
         id="organizer-email"
         className="text-input sans"
         value={organizerEmail}
         onChange={(event) => setOrganizerEmail(event.target.value)}
-        placeholder="Used only if you lose this poll's organizer link"
+        placeholder={t("organizerEmailPlaceholder")}
         type="email"
       />
       <p className="field-help sans">
-        If you enter an email, PoliPol can send this poll's private organizer link back to you.
+        {t("organizerEmailHelp")}
       </p>
 
       <div style={{ height: 24 }} />
 
-      <label className="field-label sans">Proposed slots</label>
+      <label className="field-label sans">{t("proposedSlots")}</label>
       <div className="slot-list">
         {slots.map((slot) => (
           <div className="slot-row sans" key={slot.id}>
             <input
-              aria-label="Date"
+              aria-label={t("date")}
               type="date"
               value={slot.date}
               onChange={(event) => updateSlot(slot.id, "date", event.target.value)}
             />
             <select
-              aria-label="Start time"
+              aria-label={t("startTime")}
               value={slot.start}
               onChange={(event) => updateSlot(slot.id, "start", event.target.value)}
             >
@@ -144,7 +146,7 @@ export default function HomePage() {
               -
             </span>
             <select
-              aria-label="End time"
+              aria-label={t("endTime")}
               value={slot.end}
               onChange={(event) => updateSlot(slot.id, "end", event.target.value)}
             >
@@ -157,8 +159,8 @@ export default function HomePage() {
             <button
               className="icon-button"
               type="button"
-              aria-label="Remove slot"
-              title="Remove slot"
+              aria-label={t("removeSlot")}
+              title={t("removeSlot")}
               onClick={() => removeSlot(slot.id)}
               disabled={slots.length === 1}
             >
@@ -170,20 +172,20 @@ export default function HomePage() {
 
       <button className="button button-secondary" type="button" onClick={addSlot} style={{ marginTop: 14 }}>
         <Plus size={15} />
-        Add another slot
+        {t("addSlot")}
       </button>
 
       <div style={{ marginTop: 24 }}>
         <button className="button" type="button" disabled={!canCreate} onClick={createPoll}>
-          {saving ? "Creating..." : "Create poll"}
+          {saving ? t("creating") : t("createPoll")}
         </button>
       </div>
       <p className="privacy-hint sans">
-        Poll data is handled as described in the <a href="/privacy">Privacy policy</a>.
+        {t("pollDataPrefix")} <a href="/privacy">{t("privacyPolicy")}</a>.
       </p>
 
       <p className="small-action sans">
-        Lost an organizer link? <a href="/recover">Recover your polls by email</a>.
+        {t("lostOrganizerLink")} <a href="/recover">{t("recoverPolls")}</a>.
       </p>
 
       {error ? <p className="error-text sans">{error}</p> : null}

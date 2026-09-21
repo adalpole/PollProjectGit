@@ -10,6 +10,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   const { id } = await context.params;
   const searchParams = new URL(request.url).searchParams;
   const token = searchParams.get("token") || "";
+  const language = searchParams.get("lang") === "it" ? "it" : "en";
   const format = searchParams.get("format") === "xlsx" ? "xlsx" : "csv";
 
   if (!isUuid(id) || !isUuid(token)) {
@@ -22,7 +23,9 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
 
-  const headers = ["name", "organization", "email"];
+  const headers = language === "it"
+    ? ["nome", "organizzazione", "email"]
+    : ["name", "organization", "email"];
   const rows = event.responses.map((response) => [
     response.participant_name || "",
     response.organization,
@@ -30,7 +33,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   ]);
 
   if (format === "xlsx") {
-    const workbook = await toXlsx(headers, rows, "All respondents");
+    const workbook = await toXlsx(headers, rows, language === "it" ? "Tutti i rispondenti" : "All respondents");
     return xlsxDownloadResponse(`polipol-${event.id}-all-respondents.xlsx`, workbook);
   }
 

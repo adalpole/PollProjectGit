@@ -97,6 +97,7 @@ For the v3 branding/domain setup outside this repository:
 - **v3.7** adds a "Calendar to be shared" `.ics` download for the confirmed slot.
 - **v3.8** warns participants when the organizer has already selected a slot while still allowing late responses.
 - **v3.8.1** changes proposed start and end times to browser-independent five-minute selectors.
+- **v4.0** adds a persistent English/Italian language selector and localizes the full poll workflow, legal pages, recovery emails, dates, and organizer exports.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit

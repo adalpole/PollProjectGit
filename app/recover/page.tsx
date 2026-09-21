@@ -2,8 +2,10 @@
 
 import { ArrowLeft, Mail } from "lucide-react";
 import { useState } from "react";
+import { localizeApiError, useLanguage } from "../../lib/i18n";
 
 export default function RecoverPage() {
+  const { language, t } = useLanguage();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
@@ -20,19 +22,19 @@ export default function RecoverPage() {
       const response = await fetch("/api/recover", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: email.trim(), language }),
       });
       const payload = (await response.json().catch(() => null)) as
         | { message?: string; error?: string }
         | null;
 
       if (!response.ok) {
-        throw new Error(payload?.error || "Could not submit recovery request.");
+        throw new Error(localizeApiError(payload?.error, language, t("errorRecovery")));
       }
 
-      setStatus(payload?.message || "If we found any polls tied to that email, we've sent the links.");
+      setStatus(payload?.message || t("recoveryGeneric"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not submit recovery request.");
+      setError(err instanceof Error ? err.message : t("errorRecovery"));
     } finally {
       setSending(false);
     }
@@ -41,23 +43,22 @@ export default function RecoverPage() {
   return (
     <section className="section fadein">
       <a className="back-link sans" href="/">
-        <ArrowLeft size={14} /> Back
+        <ArrowLeft size={14} /> {t("back")}
       </a>
 
       <p className="page-kicker sans" style={{ marginTop: 28 }}>
-        Organizer link recovery
+        {t("recoveryKicker")}
       </p>
-      <h1 className="page-title">Recover your poll links</h1>
+      <h1 className="page-title">{t("recoverTitle")}</h1>
 
       <div className="recover-panel">
         <Mail size={20} color="var(--primary)" />
         <p className="recover-copy sans">
-          Enter the organizer email you used when creating a poll. If any polls are tied to that
-          email, PoliPol will send the private organizer links.
+          {t("recoveryCopy")}
         </p>
 
         <label className="field-label sans" htmlFor="recovery-email">
-          Email
+          {t("email")}
         </label>
         <input
           id="recovery-email"
@@ -75,11 +76,10 @@ export default function RecoverPage() {
           onClick={submitRecovery}
           style={{ marginTop: 22 }}
         >
-          {sending ? "Sending..." : "Send recovery email"}
+          {sending ? t("sending") : t("sendRecovery")}
         </button>
         <p className="privacy-hint sans">
-          Recovery requests use your email only to look for organizer links. See the{" "}
-          <a href="/privacy">Privacy policy</a>.
+          {t("recoveryPrivacyPrefix")} <a href="/privacy">{t("privacyPolicy")}</a>.
         </p>
 
         {status ? <p className="success-text sans">{status}</p> : null}

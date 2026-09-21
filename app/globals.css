@@ -75,12 +75,19 @@ a {
 }
 
 .site-header__inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: baseline;
   gap: 12px;
   max-width: 900px;
   margin: 0 auto;
   padding: 28px 20px 20px;
+}
+
+.site-header__brand-row {
+  align-items: center;
+  display: flex;
+  gap: 12px;
 }
 
 .brand {
@@ -123,6 +130,33 @@ a {
   font-size: 12.5px;
   letter-spacing: 0.3px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.language-switcher {
+  align-self: center;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.language-switcher button {
+  background: var(--paper-raised);
+  border: none;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  min-height: 30px;
+  padding: 6px 9px;
+}
+
+.language-switcher button + button {
+  border-left: 1px solid var(--line);
+}
+
+.language-switcher button[data-active="true"] {
+  background: var(--primary);
+  color: #ffffff;
 }
 
 .fadein {
@@ -896,9 +930,14 @@ a.button-secondary:hover {
 
 @media (max-width: 720px) {
   .site-header__inner {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    grid-template-columns: 1fr auto;
+    gap: 6px 12px;
+  }
+
+  .tagline {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 
   .toolbar {

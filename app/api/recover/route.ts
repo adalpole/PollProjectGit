@@ -4,7 +4,6 @@ import { isValidEmail, normalizeEmail } from "../../../lib/validation";
 
 export const runtime = "nodejs";
 
-const GENERIC_MESSAGE = "If we found any polls tied to that email, we've sent the links.";
 const RECOVERY_LIMIT = 3;
 const RECOVERY_WINDOW_MS = 60 * 60 * 1000;
 
@@ -52,7 +51,7 @@ function buildOrganizerUrl(origin: string, event: RecoveryEvent) {
   return `${origin.replace(/\/$/, "")}/e/${event.id}/${event.organizer_token}`;
 }
 
-function buildRecoveryEmail(origin: string, events: RecoveryEvent[]) {
+function buildRecoveryEmail(origin: string, events: RecoveryEvent[], language: "en" | "it") {
   const links = events.map((event) => {
     const url = buildOrganizerUrl(origin, event);
     return {
@@ -61,18 +60,30 @@ function buildRecoveryEmail(origin: string, events: RecoveryEvent[]) {
     };
   });
 
+  const copy = language === "it"
+    ? {
+        heading: "I tuoi link organizzatore PoliPol",
+        intro: "Ecco i link privati dell'organizzatore associati a questo indirizzo email.",
+        ignore: "Se non hai richiesto questa email, puoi ignorarla.",
+      }
+    : {
+        heading: "Your PoliPol organizer links",
+        intro: "Here are the private organizer links tied to this email address.",
+        ignore: "If you did not request this email, you can ignore it.",
+      };
+
   const text = [
-    "Your PoliPol organizer links:",
+    `${copy.heading}:`,
     "",
     ...links.map((link) => `${link.title}: ${link.url}`),
     "",
-    "If you did not request this email, you can ignore it.",
+    copy.ignore,
   ].join("\n");
 
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.5; color: #07182f;">
-      <h1 style="font-size: 20px; margin: 0 0 14px;">Your PoliPol organizer links</h1>
-      <p style="margin: 0 0 16px;">Here are the private organizer links tied to this email address.</p>
+      <h1 style="font-size: 20px; margin: 0 0 14px;">${copy.heading}</h1>
+      <p style="margin: 0 0 16px;">${copy.intro}</p>
       <ul style="padding-left: 20px; margin: 0 0 16px;">
         ${links
           .map(
@@ -85,14 +96,14 @@ function buildRecoveryEmail(origin: string, events: RecoveryEvent[]) {
           )
           .join("")}
       </ul>
-      <p style="margin: 0; color: #53677f; font-size: 13px;">If you did not request this email, you can ignore it.</p>
+      <p style="margin: 0; color: #53677f; font-size: 13px;">${copy.ignore}</p>
     </div>
   `;
 
   return { html, text };
 }
 
-async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEvent[]) {
+async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEvent[], language: "en" | "it") {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL || "PoliPol <recovery@mail.polipol.it>";
 
@@ -100,7 +111,7 @@ async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEve
     throw new Error("Missing RESEND_API_KEY.");
   }
 
-  const email = buildRecoveryEmail(origin, events);
+  const email = buildRecoveryEmail(origin, events, language);
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -110,7 +121,7 @@ async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEve
     body: JSON.stringify({
       from,
       to,
-      subject: "Your PoliPol organizer links",
+      subject: language === "it" ? "I tuoi link organizzatore PoliPol" : "Your PoliPol organizer links",
       html: email.html,
       text: email.text,
     }),
@@ -123,8 +134,12 @@ async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEve
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json().catch(() => null)) as { email?: unknown } | null;
+  const body = (await request.json().catch(() => null)) as { email?: unknown; language?: unknown } | null;
   const email = typeof body?.email === "string" ? normalizeEmail(body.email) : "";
+  const language = body?.language === "it" ? "it" : "en";
+  const genericMessage = language === "it"
+    ? "Se abbiamo trovato sondaggi associati a questa email, abbiamo inviato i link."
+    : "If we found any polls tied to that email, we've sent the links.";
 
   if (!isValidEmail(email)) {
     return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
@@ -153,12 +168,12 @@ export async function POST(request: Request) {
       const events = (data || []) as RecoveryEvent[];
       if (events.length > 0) {
         const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
-        await sendRecoveryEmail(email, origin, events);
+        await sendRecoveryEmail(email, origin, events, language);
       }
     } catch (error) {
       console.error("Recovery email failed", error);
     }
   }
 
-  return NextResponse.json({ message: GENERIC_MESSAGE });
+  return NextResponse.json({ message: genericMessage });
 }

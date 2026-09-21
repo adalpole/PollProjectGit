@@ -3,6 +3,7 @@
 import { Check, Circle, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { formatSlot } from "../../../lib/format";
+import { localizeApiError, useLanguage } from "../../../lib/i18n";
 import { createEmptyResponseSummary, normalizePublicEvent } from "../../../lib/response-summary";
 import type {
   AvailabilityStatus,
@@ -12,6 +13,7 @@ import type {
 } from "../../../lib/types";
 
 export default function ParticipantForm({ event }: { event: PublicEvent }) {
+  const { language, locale, t } = useLanguage();
   const [name, setName] = useState("");
   const [organization, setOrganization] = useState("");
   const [email, setEmail] = useState("");
@@ -76,13 +78,13 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
 
       const payload = (await response.json().catch(() => null)) as { error?: string } | null;
       if (!response.ok) {
-        throw new Error(payload?.error || "Could not record your response.");
+        throw new Error(localizeApiError(payload?.error, language, t("errorRecordResponse")));
       }
 
-      setSuccess("Thanks - your response has been recorded.");
+      setSuccess(t("responseRecorded"));
       await refreshResponseSummary();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not record your response.");
+      setError(err instanceof Error ? err.message : t("errorRecordResponse"));
     } finally {
       setSaving(false);
     }
@@ -94,7 +96,7 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
         {event.title}
       </h1>
       <p className="page-kicker sans" style={{ marginBottom: 24 }}>
-        Add your availability for the proposed slots.
+        {t("addAvailability")}
       </p>
 
       <ConfirmedSlotNotice event={event} />
@@ -102,32 +104,32 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
       <div className="respond-fields">
         <div>
           <label className="field-label sans" htmlFor="name">
-            Name optional
+            {t("nameOptional")}
           </label>
           <input
             id="name"
             className="text-input sans"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="Your name"
+            placeholder={t("yourName")}
           />
         </div>
         <div>
           <label className="field-label sans" htmlFor="organization">
-            Organization
+            {t("organization")}
           </label>
           <input
             id="organization"
             className="text-input sans"
             value={organization}
             onChange={(event) => setOrganization(event.target.value)}
-            placeholder="Your institution or team"
+            placeholder={t("organizationPlaceholder")}
             required
           />
         </div>
         <div>
           <label className="field-label sans" htmlFor="email">
-            Email
+            {t("email")}
           </label>
           <input
             id="email"
@@ -145,7 +147,7 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
 
       <div className="availability-list">
         {event.slots.map((slot, index) => {
-          const formatted = formatSlot(slot);
+          const formatted = formatSlot(slot, locale);
           const status = availability[index];
           const preference = preferencesBySlot.get(index) ?? createEmptySlotPreference(index);
           return (
@@ -159,19 +161,19 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
               ) : null}
               <div className="status-group">
                 <StatusButton
-                  label="Yes"
+                  label={t("yes")}
                   status="yes"
                   active={status === "yes"}
                   onClick={() => setSlotStatus(index, "yes")}
                 />
                 <StatusButton
-                  label="If needed"
+                  label={t("ifNeeded")}
                   status="maybe"
                   active={status === "maybe"}
                   onClick={() => setSlotStatus(index, "maybe")}
                 />
                 <StatusButton
-                  label="No"
+                  label={t("no")}
                   status="no"
                   active={status === "no"}
                   onClick={() => setSlotStatus(index, "no")}
@@ -183,12 +185,12 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
       </div>
 
       <button className="button" type="button" disabled={!canSubmit} onClick={submit} style={{ marginTop: 22 }}>
-        {saving ? "Submitting..." : "Submit response"}
+        {saving ? t("submitting") : t("submitResponse")}
       </button>
       <p className="privacy-hint sans">
-        By submitting, your response is stored for this poll and visible to the organizer. See the{" "}
+        {t("submitPrivacyPrefix")} {" "}
         <a href="/privacy" target="_blank" rel="noreferrer">
-          Privacy policy
+          {t("privacyPolicy")}
         </a>
         .
       </p>
@@ -198,7 +200,7 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
         <p className="success-text sans">
           <span>{success}</span>
           <span className="success-text__hint">
-            You can change your answers and submit again as long as you keep this page open.
+            {t("responseChangeHint")}
           </span>
         </p>
       ) : null}
@@ -207,6 +209,7 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
 }
 
 function ConfirmedSlotNotice({ event }: { event: PublicEvent }) {
+  const { locale, t } = useLanguage();
   if (event.confirmed_slot_index === null) {
     return null;
   }
@@ -217,15 +220,12 @@ function ConfirmedSlotNotice({ event }: { event: PublicEvent }) {
     return null;
   }
 
-  const formatted = formatSlot(selectedSlot);
+  const formatted = formatSlot(selectedSlot, locale);
 
   return (
     <div className="confirmed-slot-notice sans">
-      <span className="confirmed-slot-notice__label">Slot selected</span>
-      <span>
-        The organizer has selected {formatted.day}, {formatted.time}. You can still submit
-        availability, but the meeting may already be scheduled.
-      </span>
+      <span className="confirmed-slot-notice__label">{t("slotSelected")}</span>
+      <span>{t("selectedSlotNotice", { day: formatted.day, time: formatted.time })}</span>
     </div>
   );
 }
@@ -251,13 +251,14 @@ function createEmptySlotPreference(index: number): PublicSlotPreference {
 }
 
 function PreferencePanel({ totalResponses }: { totalResponses: number }) {
+  const { t } = useLanguage();
   const responseLabel =
-    totalResponses === 1 ? "1 response so far" : `${totalResponses} responses so far`;
+    totalResponses === 1 ? t("oneResponse") : t("manyResponses", { count: totalResponses });
 
   return (
     <div className={`preference-panel sans ${totalResponses === 0 ? "preference-panel--empty" : ""}`}>
-      <span className="preference-panel__label">Preferences so far</span>
-      <span>{totalResponses > 0 ? responseLabel : "No previous preferences yet."}</span>
+      <span className="preference-panel__label">{t("preferencesSoFar")}</span>
+      <span>{totalResponses > 0 ? responseLabel : t("noPreferences")}</span>
     </div>
   );
 }
@@ -269,13 +270,17 @@ function SlotPreferenceChart({
   preference: PublicSlotPreference;
   totalResponses: number;
 }) {
-  const yesLabel = preference.yes_count === 1 ? "1 yes" : `${preference.yes_count} yes`;
-  const ifNeededLabel =
-    preference.if_needed_count === 1
-      ? "1 if needed"
-      : `${preference.if_needed_count} if needed`;
-  const noLabel = preference.no_count === 1 ? "1 no" : `${preference.no_count} no`;
-  const chartLabel = `${preference.answer_count} of ${totalResponses} respondents chose this slot: ${yesLabel}, ${ifNeededLabel}, ${noLabel}.`;
+  const { t } = useLanguage();
+  const yesLabel = t("yesCount", { count: preference.yes_count });
+  const ifNeededLabel = t("ifNeededCount", { count: preference.if_needed_count });
+  const noLabel = t("noCount", { count: preference.no_count });
+  const chartLabel = t("chartLabel", {
+    answers: preference.answer_count,
+    total: totalResponses,
+    yes: yesLabel,
+    maybe: ifNeededLabel,
+    no: noLabel,
+  });
 
   return (
     <div className="preference-chart sans" aria-label={chartLabel}>
@@ -286,7 +291,7 @@ function SlotPreferenceChart({
       />
       <span className="preference-chart__copy">
         <span className="preference-chart__total">
-          {preference.answer_count}/{totalResponses} chose this
+          {t("choseThis", { answers: preference.answer_count, total: totalResponses })}
         </span>
         <span className="preference-chart__legend" aria-hidden="true">
           <span>

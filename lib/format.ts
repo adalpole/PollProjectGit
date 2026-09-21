@@ -1,8 +1,8 @@
 import type { Slot } from "./types";
 
-export function formatSlot(slot: Slot) {
+export function formatSlot(slot: Slot, locale?: string) {
   const date = new Date(`${slot.date}T00:00:00`);
-  const day = date.toLocaleDateString(undefined, {
+  const day = date.toLocaleDateString(locale, {
     weekday: "short",
     month: "short",
     day: "numeric",

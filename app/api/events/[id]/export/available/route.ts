@@ -11,6 +11,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   const { id } = await context.params;
   const searchParams = new URL(request.url).searchParams;
   const token = searchParams.get("token") || "";
+  const language = searchParams.get("lang") === "it" ? "it" : "en";
   const rawFormat = searchParams.get("format");
   const format = rawFormat === "xlsx" || rawFormat === "ics" ? rawFormat : "csv";
 
@@ -43,6 +44,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       title: event.title,
       slot: selectedSlot,
       publicUrl,
+      language,
     });
 
     return icsDownloadResponse(`polipol-${event.id}-calendar.ics`, calendar);
@@ -55,16 +57,20 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     }))
     .filter(({ value }) => value === "yes" || value === "maybe");
 
-  const headers = ["name", "organization", "email", "status"];
+  const headers = language === "it"
+    ? ["nome", "organizzazione", "email", "stato"]
+    : ["name", "organization", "email", "status"];
   const rows = available.map(({ response, value }) => [
     response.participant_name || "",
     response.organization,
     response.email,
-    value === "yes" ? "available" : "if needed",
+    value === "yes"
+      ? language === "it" ? "disponibile" : "available"
+      : language === "it" ? "se necessario" : "if needed",
   ]);
 
   if (format === "xlsx") {
-    const workbook = await toXlsx(headers, rows, "Selected slot");
+    const workbook = await toXlsx(headers, rows, language === "it" ? "Fascia selezionata" : "Selected slot");
     return xlsxDownloadResponse(`polipol-${event.id}-selected-slot.xlsx`, workbook);
   }
 
