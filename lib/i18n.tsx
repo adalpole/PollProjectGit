@@ -6,7 +6,7 @@ export type Language = "en" | "it";
 
 const translations = {
   en: {
-    tagline: "a register for finding a time everyone keeps",
+    tagline: "Find the right time for everyone in 30 seconds, no sign-up required",
     legalLinks: "Legal links",
     privacyPolicy: "Privacy policy",
     cookiePolicy: "Cookie policy",
@@ -91,7 +91,7 @@ const translations = {
     language: "Language",
   },
   it: {
-    tagline: "un registro per trovare un orario adatto a tutti",
+    tagline: "Trova l'orario giusto per tutti in 30 secondi, senza registrazione",
     legalLinks: "Link legali",
     privacyPolicy: "Informativa sulla privacy",
     cookiePolicy: "Informativa sui cookie",
