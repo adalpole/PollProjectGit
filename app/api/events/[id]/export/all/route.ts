@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { csvDownloadResponse, toCsv } from "../../../../../../lib/csv";
+import { eventDownloadName } from "../../../../../../lib/download-filename";
 import { loadOrganizerEvent } from "../../../../../../lib/organizer";
 import { isUuid } from "../../../../../../lib/validation";
 import { toXlsx, xlsxDownloadResponse } from "../../../../../../lib/xlsx";
@@ -31,12 +32,16 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     response.organization,
     response.email,
   ]);
+  const selectedSlot = event.confirmed_slot_index === null
+    ? undefined
+    : event.slots[event.confirmed_slot_index];
+  const filename = eventDownloadName(event.title, selectedSlot);
 
   if (format === "xlsx") {
     const workbook = await toXlsx(headers, rows, language === "it" ? "Tutti i rispondenti" : "All respondents");
-    return xlsxDownloadResponse(`polipol-${event.id}-all-respondents.xlsx`, workbook);
+    return xlsxDownloadResponse(`${filename}-all-respondents.xlsx`, workbook);
   }
 
   const csv = toCsv(headers, rows);
-  return csvDownloadResponse(`polipol-${event.id}-all-respondents.csv`, csv);
+  return csvDownloadResponse(`${filename}-all-respondents.csv`, csv);
 }

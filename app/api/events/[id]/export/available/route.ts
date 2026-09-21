@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { csvDownloadResponse, toCsv } from "../../../../../../lib/csv";
+import { eventDownloadName } from "../../../../../../lib/download-filename";
 import { buildCalendarFile, icsDownloadResponse } from "../../../../../../lib/ics";
 import { loadOrganizerEvent } from "../../../../../../lib/organizer";
 import { isUuid } from "../../../../../../lib/validation";
@@ -36,6 +37,8 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     return NextResponse.json({ error: "Selected slot is not valid." }, { status: 400 });
   }
 
+  const filename = eventDownloadName(event.title, selectedSlot);
+
   if (format === "ics") {
     const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
     const publicUrl = `${origin.replace(/\/$/, "")}/e/${event.id}`;
@@ -47,7 +50,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       language,
     });
 
-    return icsDownloadResponse(`polipol-${event.id}-calendar.ics`, calendar);
+    return icsDownloadResponse(`${filename}-calendar.ics`, calendar);
   }
 
   const available = event.responses
@@ -71,9 +74,9 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 
   if (format === "xlsx") {
     const workbook = await toXlsx(headers, rows, language === "it" ? "Fascia selezionata" : "Selected slot");
-    return xlsxDownloadResponse(`polipol-${event.id}-selected-slot.xlsx`, workbook);
+    return xlsxDownloadResponse(`${filename}-available.xlsx`, workbook);
   }
 
   const csv = toCsv(headers, rows);
-  return csvDownloadResponse(`polipol-${event.id}-selected-slot.csv`, csv);
+  return csvDownloadResponse(`${filename}-available.csv`, csv);
 }

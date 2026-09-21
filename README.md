@@ -102,6 +102,7 @@ For the v3 branding/domain setup outside this repository:
 - **v4.0.2** aligns the title field and its example text with the interface font used by the other form fields.
 - **v4.0.3** fixes Excel downloads by using the color format required by the workbook generator.
 - **v4.0.4** changes the selected-slot participant notice from light blue to light red for stronger visibility.
+- **v4.0.5** names CSV, Excel, and calendar downloads after the poll title and, when selected, its confirmed date and time.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit
