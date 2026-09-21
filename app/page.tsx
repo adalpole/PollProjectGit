@@ -96,7 +96,7 @@ export default function HomePage() {
       </label>
       <input
         id="title"
-        className="text-input"
+        className="text-input sans"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         placeholder={t("titlePlaceholder")}
