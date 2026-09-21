@@ -400,11 +400,11 @@ a.button-secondary:hover {
 
 .confirmed-slot-notice {
   align-items: flex-start;
-  background: #d9f2ff;
-  border: 1px solid var(--line-soft);
-  border-left: 4px solid var(--primary);
+  background: #fdecea;
+  border: 1px solid #efc4bf;
+  border-left: 4px solid var(--red);
   border-radius: 4px;
-  color: var(--primary);
+  color: #7d2d27;
   display: flex;
   gap: 9px;
   line-height: 1.45;

@@ -101,6 +101,7 @@ For the v3 branding/domain setup outside this repository:
 - **v4.0.1** replaces the header tagline with a clearer, localized 30-second no-registration message.
 - **v4.0.2** aligns the title field and its example text with the interface font used by the other form fields.
 - **v4.0.3** fixes Excel downloads by using the color format required by the workbook generator.
+- **v4.0.4** changes the selected-slot participant notice from light blue to light red for stronger visibility.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit
