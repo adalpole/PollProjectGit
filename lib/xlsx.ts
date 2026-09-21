@@ -4,9 +4,9 @@ type ExportCell = string | number | null | undefined;
 
 const HEADER_STYLE = {
   fontWeight: "bold" as const,
-  textColor: "102C53",
-  backgroundColor: "E7F7FF",
-  borderColor: "C9D9E8",
+  textColor: "#102C53",
+  backgroundColor: "#E7F7FF",
+  borderColor: "#C9D9E8",
   borderStyle: "thin" as const,
 };
 
@@ -29,7 +29,7 @@ export async function toXlsx(
       row.map((value) => ({
         value: normalizeCellValue(value),
         type: String,
-        borderColor: "DEEBF6",
+        borderColor: "#DEEBF6",
         borderStyle: "thin" as const,
       })),
     ),
