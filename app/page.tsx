@@ -124,6 +124,7 @@ export default function HomePage() {
             <input
               aria-label="Start time"
               type="time"
+              step={300}
               value={slot.start}
               onChange={(event) => updateSlot(slot.id, "start", event.target.value)}
             />
@@ -133,6 +134,7 @@ export default function HomePage() {
             <input
               aria-label="End time"
               type="time"
+              step={300}
               value={slot.end}
               onChange={(event) => updateSlot(slot.id, "end", event.target.value)}
             />

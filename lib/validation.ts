@@ -32,7 +32,13 @@ export function parseSlots(input: unknown): Slot[] | null {
     const start = typeof item.start === "string" ? item.start : "";
     const end = typeof item.end === "string" ? item.end : "";
 
-    if (!DATE_RE.test(date) || !TIME_RE.test(start) || !TIME_RE.test(end)) {
+    if (
+      !DATE_RE.test(date) ||
+      !TIME_RE.test(start) ||
+      !TIME_RE.test(end) ||
+      !isFiveMinuteTime(start) ||
+      !isFiveMinuteTime(end)
+    ) {
       return null;
     }
 
@@ -44,6 +50,11 @@ export function parseSlots(input: unknown): Slot[] | null {
   }
 
   return slots;
+}
+
+function isFiveMinuteTime(value: string) {
+  const minutes = Number(value.slice(3, 5));
+  return minutes % 5 === 0;
 }
 
 export function parseAvailability(input: unknown, expectedLength: number): AvailabilityStatus[] | null {
