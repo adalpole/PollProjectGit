@@ -96,7 +96,7 @@ For the v3 branding/domain setup outside this repository:
 - **v3.6** adds organizer download menus with CSV and Excel `.xlsx` options.
 - **v3.7** adds a "Calendar to be shared" `.ics` download for the confirmed slot.
 - **v3.8** warns participants when the organizer has already selected a slot while still allowing late responses.
-- **v3.8.1** changes proposed start and end times to five-minute increments.
+- **v3.8.1** changes proposed start and end times to browser-independent five-minute selectors.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit

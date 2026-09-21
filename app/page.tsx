@@ -6,6 +6,14 @@ import type { Slot } from "../lib/types";
 
 type EditableSlot = Slot & { id: string };
 
+const TIME_OPTIONS = Array.from({ length: 24 * 12 }, (_, index) => {
+  const hours = Math.floor(index / 12)
+    .toString()
+    .padStart(2, "0");
+  const minutes = ((index % 12) * 5).toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+});
+
 function newSlot(): EditableSlot {
   return {
     id: crypto.randomUUID(),
@@ -121,23 +129,31 @@ export default function HomePage() {
               value={slot.date}
               onChange={(event) => updateSlot(slot.id, "date", event.target.value)}
             />
-            <input
+            <select
               aria-label="Start time"
-              type="time"
-              step={300}
               value={slot.start}
               onChange={(event) => updateSlot(slot.id, "start", event.target.value)}
-            />
+            >
+              {TIME_OPTIONS.map((time) => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
             <span aria-hidden="true" style={{ color: "var(--muted)" }}>
               -
             </span>
-            <input
+            <select
               aria-label="End time"
-              type="time"
-              step={300}
               value={slot.end}
               onChange={(event) => updateSlot(slot.id, "end", event.target.value)}
-            />
+            >
+              {TIME_OPTIONS.map((time) => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
             <button
               className="icon-button"
               type="button"
