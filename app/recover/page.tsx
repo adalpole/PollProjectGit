@@ -21,7 +21,10 @@ export default function RecoverPage() {
     try {
       const response = await fetch("/api/recover", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "accept-language": language,
+          "content-type": "application/json",
+        },
         body: JSON.stringify({ email: email.trim(), language }),
       });
       const payload = (await response.json().catch(() => null)) as

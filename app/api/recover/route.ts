@@ -19,6 +19,8 @@ type LimitEntry = {
   resetAt: number;
 };
 
+type RecoveryLanguage = "en" | "it";
+
 const recoveryAttempts = new Map<string, LimitEntry>();
 
 function checkRateLimit(email: string) {
@@ -51,7 +53,7 @@ function buildOrganizerUrl(origin: string, event: RecoveryEvent) {
   return `${origin.replace(/\/$/, "")}/e/${event.id}/${event.organizer_token}`;
 }
 
-function buildRecoveryEmail(origin: string, events: RecoveryEvent[], language: "en" | "it") {
+function buildRecoveryEmail(origin: string, events: RecoveryEvent[], language: RecoveryLanguage) {
   const links = events.map((event) => {
     const url = buildOrganizerUrl(origin, event);
     return {
@@ -62,8 +64,8 @@ function buildRecoveryEmail(origin: string, events: RecoveryEvent[], language: "
 
   const copy = language === "it"
     ? {
-        heading: "I tuoi link organizzatore PoliPol",
-        intro: "Ecco i link privati dell'organizzatore associati a questo indirizzo email.",
+        heading: "Recupero dei link organizzatore PoliPol",
+        intro: "Di seguito trovi i link privati dell'organizzatore associati al tuo indirizzo email.",
         ignore: "Se non hai richiesto questa email, puoi ignorarla.",
       }
     : {
@@ -81,7 +83,7 @@ function buildRecoveryEmail(origin: string, events: RecoveryEvent[], language: "
   ].join("\n");
 
   const html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.5; color: #07182f;">
+    <div lang="${language}" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.5; color: #07182f;">
       <h1 style="font-size: 20px; margin: 0 0 14px;">${copy.heading}</h1>
       <p style="margin: 0 0 16px;">${copy.intro}</p>
       <ul style="padding-left: 20px; margin: 0 0 16px;">
@@ -103,7 +105,7 @@ function buildRecoveryEmail(origin: string, events: RecoveryEvent[], language: "
   return { html, text };
 }
 
-async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEvent[], language: "en" | "it") {
+async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEvent[], language: RecoveryLanguage) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL || "PoliPol <recovery@mail.polipol.it>";
 
@@ -121,7 +123,9 @@ async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEve
     body: JSON.stringify({
       from,
       to,
-      subject: language === "it" ? "I tuoi link organizzatore PoliPol" : "Your PoliPol organizer links",
+      subject: language === "it"
+        ? "Recupero link organizzatore PoliPol"
+        : "Your PoliPol organizer links",
       html: email.html,
       text: email.text,
     }),
@@ -136,7 +140,7 @@ async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEve
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as { email?: unknown; language?: unknown } | null;
   const email = typeof body?.email === "string" ? normalizeEmail(body.email) : "";
-  const language = body?.language === "it" ? "it" : "en";
+  const language = resolveRecoveryLanguage(body?.language, request.headers.get("accept-language"));
   const genericMessage = language === "it"
     ? "Se abbiamo trovato sondaggi associati a questa email, abbiamo inviato i link."
     : "If we found any polls tied to that email, we've sent the links.";
@@ -176,4 +180,16 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ message: genericMessage });
+}
+
+function resolveRecoveryLanguage(value: unknown, acceptLanguage: string | null): RecoveryLanguage {
+  if (value === "en" || value === "it") {
+    return value;
+  }
+
+  if (acceptLanguage?.toLowerCase().startsWith("en")) {
+    return "en";
+  }
+
+  return "it";
 }
