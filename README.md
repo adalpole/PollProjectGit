@@ -105,6 +105,7 @@ For the v3 branding/domain setup outside this repository:
 - **v4.0.5** names CSV, Excel, and calendar downloads after the poll title and, when selected, its confirmed date and time.
 - **v4.0.6** ensures recovery confirmations and emails use Italian for the Italian interface, with browser-language detection and an Italian fallback.
 - **v4.0.7** improves the Italian recovery confirmation message with clearer, privacy-preserving wording.
+- **v4.0.8** replaces the default 404 with a bilingual PoliPol page for invalid or deleted poll links.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit

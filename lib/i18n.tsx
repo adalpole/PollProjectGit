@@ -88,6 +88,10 @@ const translations = {
     recoveryPrivacyPrefix: "Recovery requests use your email only to look for organizer links. See the",
     recoveryGeneric: "If we found any polls tied to that email, we've sent the links.",
     errorRecovery: "Could not submit recovery request.",
+    notFoundTitle: "This poll is not available",
+    notFoundCopy: "The link may be incorrect, or the poll may have been deleted by its organizer.",
+    returnHome: "Return to home",
+    recoverOrganizerLinks: "Recover organizer links",
     language: "Language",
   },
   it: {
@@ -173,6 +177,10 @@ const translations = {
     recoveryPrivacyPrefix: "La richiesta usa la tua email solo per cercare i link organizzatore. Consulta l'",
     recoveryGeneric: "Se questo indirizzo è associato a uno o più sondaggi, riceverai a breve un'email con i relativi link.",
     errorRecovery: "Impossibile inviare la richiesta di recupero.",
+    notFoundTitle: "Questo sondaggio non è disponibile",
+    notFoundCopy: "Il link potrebbe non essere corretto oppure il sondaggio potrebbe essere stato eliminato dall'organizzatore.",
+    returnHome: "Torna alla pagina iniziale",
+    recoverOrganizerLinks: "Recupera i link organizzatore",
     language: "Lingua",
   },
 } as const;

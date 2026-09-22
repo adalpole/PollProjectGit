@@ -298,6 +298,37 @@ a.button-secondary:hover {
   text-decoration: none;
 }
 
+.not-found-page {
+  max-width: 620px;
+}
+
+.not-found-icon {
+  align-items: center;
+  background: #fdecea;
+  border: 1px solid #efc4bf;
+  border-radius: 4px;
+  color: var(--red);
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  margin-bottom: 18px;
+  width: 44px;
+}
+
+.not-found-copy {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+  margin: -10px 0 24px;
+  max-width: 540px;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .small-action {
   color: var(--muted);
   font-size: 13px;
