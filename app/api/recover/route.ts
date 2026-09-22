@@ -142,7 +142,7 @@ export async function POST(request: Request) {
   const email = typeof body?.email === "string" ? normalizeEmail(body.email) : "";
   const language = resolveRecoveryLanguage(body?.language, request.headers.get("accept-language"));
   const genericMessage = language === "it"
-    ? "Se abbiamo trovato sondaggi associati a questa email, abbiamo inviato i link."
+    ? "Se questo indirizzo è associato a uno o più sondaggi, riceverai a breve un'email con i relativi link."
     : "If we found any polls tied to that email, we've sent the links.";
 
   if (!isValidEmail(email)) {

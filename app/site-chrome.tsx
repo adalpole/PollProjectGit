@@ -23,7 +23,7 @@ function Header() {
             <img className="brand-mark" src="/polipol-icon.png" alt="" aria-hidden="true" />
             <span>PoliPol</span>
           </a>
-          <span className="version-badge sans">v4.0.6</span>
+          <span className="version-badge sans">v4.0.7</span>
         </div>
         <span className="tagline">{t("tagline")}</span>
         <LanguageSwitcher />
@@ -57,7 +57,7 @@ function Footer() {
 
   return (
     <footer className="site-footer sans">
-      <span>PoliPol v4.0.6</span>
+      <span>PoliPol v4.0.7</span>
       <nav className="site-footer__links" aria-label={t("legalLinks")}>
         <a href="/privacy">{t("privacyPolicy")}</a>
         <a href="/cookies">{t("cookiePolicy")}</a>

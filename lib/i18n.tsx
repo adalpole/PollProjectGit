@@ -171,7 +171,7 @@ const translations = {
     sending: "Invio...",
     sendRecovery: "Invia email di recupero",
     recoveryPrivacyPrefix: "La richiesta usa la tua email solo per cercare i link organizzatore. Consulta l'",
-    recoveryGeneric: "Se abbiamo trovato sondaggi associati a questa email, abbiamo inviato i link.",
+    recoveryGeneric: "Se questo indirizzo è associato a uno o più sondaggi, riceverai a breve un'email con i relativi link.",
     errorRecovery: "Impossibile inviare la richiesta di recupero.",
     language: "Lingua",
   },
