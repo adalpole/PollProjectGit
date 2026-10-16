@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabase";
+import { recordAppError, recordTelemetry } from "../../../lib/telemetry";
 import { isValidEmail, normalizeEmail } from "../../../lib/validation";
 
 export const runtime = "nodejs";
@@ -128,13 +129,24 @@ async function sendRecoveryEmail(to: string, origin: string, events: RecoveryEve
         : "Your PoliPol organizer links",
       html: email.html,
       text: email.text,
+      tags: [{ name: "kind", value: "recovery" }],
     }),
   });
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
+    await recordTelemetry("email_send_failed", {
+      metadata: { kind: "recovery", status: response.status },
+    });
     throw new Error(`Resend failed with ${response.status}: ${detail}`);
   }
+
+  const result = (await response.json().catch(() => null)) as { id?: unknown } | null;
+  const emailId = typeof result?.id === "string" ? result.id : undefined;
+  await recordTelemetry("email_send_succeeded", {
+    externalId: emailId ? `send:${emailId}` : undefined,
+    metadata: { kind: "recovery" },
+  });
 }
 
 export async function POST(request: Request) {
@@ -176,6 +188,7 @@ export async function POST(request: Request) {
       }
     } catch (error) {
       console.error("Recovery email failed", error);
+      await recordAppError("/api/recover", "recover_organizer_links");
     }
   }
 

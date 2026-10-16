@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabase } from "../../../lib/supabase";
+import { recordAppError, recordTelemetry, suspiciousPollReasons } from "../../../lib/telemetry";
 import { isValidEmail, normalizeEmail, parseSlots } from "../../../lib/validation";
 
 export async function POST(request: Request) {
@@ -33,10 +34,19 @@ export async function POST(request: Request) {
   });
 
   if (error) {
+    await recordAppError("/api/events", "create_poll");
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   const created = Array.isArray(data) ? data[0] : data;
+  const suspiciousReasons = suspiciousPollReasons(title);
+
+  if (suspiciousReasons.length > 0) {
+    await recordTelemetry("poll_flagged", {
+      pollId: created.id,
+      metadata: { reasons: suspiciousReasons.join(",") },
+    });
+  }
 
   return NextResponse.json({
     id: created.id,

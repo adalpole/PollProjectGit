@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabase } from "../../../../../lib/supabase";
+import { recordAppError } from "../../../../../lib/telemetry";
 import { isUuid } from "../../../../../lib/validation";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
@@ -26,6 +27,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   });
 
   if (error) {
+    await recordAppError("/api/events/[id]/confirm", "confirm_slot", id);
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 

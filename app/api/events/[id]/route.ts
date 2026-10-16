@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { loadPublicEvent } from "../../../../lib/public-event";
 import { getSupabase } from "../../../../lib/supabase";
+import { recordAppError, recordTelemetry } from "../../../../lib/telemetry";
 import { isUuid } from "../../../../lib/validation";
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
@@ -15,6 +16,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   try {
     data = await loadPublicEvent(id);
   } catch (error) {
+    await recordAppError("/api/events/[id]", "load_public_poll", id);
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -45,12 +47,15 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
   });
 
   if (error) {
+    await recordAppError("/api/events/[id]", "delete_poll", id);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   if (data !== true) {
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
+
+  await recordTelemetry("poll_deleted", { pollId: id });
 
   return NextResponse.json({ ok: true });
 }

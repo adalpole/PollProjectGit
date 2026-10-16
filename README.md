@@ -1,6 +1,6 @@
 # PoliPol
 
-PoliPol is a small, self-hosted group scheduling app built with Next.js App Router and Supabase. An organizer creates a poll, shares the public participant link, collects availability without guest accounts, and uses the private organizer URL to select a slot and export contacts. v3 rebrands the app for `polipol.it` and keeps optional organizer-link recovery by email without adding login.
+PoliPol is a small, self-hosted group scheduling app built with Next.js App Router and Supabase. An organizer creates a poll, shares the public participant link, collects availability without guest accounts, and uses the private organizer URL to select a slot and export contacts. It keeps optional organizer-link recovery by email without adding login and includes a private weekly operational digest.
 
 ## Stack
 
@@ -18,7 +18,7 @@ PoliPol is a small, self-hosted group scheduling app built with Next.js App Rout
 3. Run the full migration in `supabase/migration.sql`.
 4. In Settings -> API, copy the project URL and anon public key.
 
-The migration creates `events`, `responses`, and the private `app_state` maintenance table, enables RLS, prevents public `select` on `responses` and `app_state`, and exposes organizer-only operations through token-checking `security definer` functions. Participant-facing event queries select only public event fields plus anonymous per-slot response totals; they never return `organizer_token`, `organizer_email`, respondent names, respondent emails, or respondent organizations.
+The migration creates `events`, `responses`, and the private `app_state` and `telemetry_events` maintenance tables, enables RLS, prevents public access to private data, and exposes organizer-only operations through token-checking `security definer` functions. Participant-facing event queries select only public event fields plus anonymous per-slot response totals; they never return `organizer_token`, `organizer_email`, respondent names, respondent emails, or respondent organizations.
 
 ## Configure locally
 
@@ -29,13 +29,14 @@ NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 RESEND_API_KEY=your-resend-api-key
+RESEND_WEBHOOK_SECRET=whsec_your-resend-webhook-signing-secret
 NEXT_PUBLIC_APP_URL=https://polipol.it
 RESEND_FROM_EMAIL=PoliPol <recovery@mail.polipol.it>
 ADMIN_EMAIL=you@example.com
 CRON_SECRET=generate-a-random-string-at-least-16-characters
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `ADMIN_EMAIL`, and `CRON_SECRET` are server-only values. Never prefix them with `NEXT_PUBLIC_`. The service role key is used by `/api/recover` and `/api/keepalive` so private lookup and aggregate maintenance work stay server-side.
+`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `RESEND_FROM_EMAIL`, `ADMIN_EMAIL`, and `CRON_SECRET` are server-only values. Never prefix them with `NEXT_PUBLIC_`. The service role key is used by server routes so private lookup, telemetry, and aggregate maintenance work stay server-side.
 
 Install and run:
 
@@ -64,6 +65,7 @@ For the v3 branding/domain setup outside this repository:
 - For **v3.2**, run `supabase/v3.2-public-preferences.sql` once in the Supabase SQL editor before or soon after deploying, so participant pages can show anonymous preference totals.
 - For **v3.3**, configure or forward `privacy@polipol.it`, or edit the policy pages to use a different monitored privacy contact.
 - For **v3.5**, run `supabase/v3.5-keepalive-digest.sql` once in the Supabase SQL editor before or soon after deploying. Then add `ADMIN_EMAIL` and `CRON_SECRET` in Vercel Project Settings -> Environment Variables. The daily cron schedule is defined in `vercel.json`.
+- For **v5.0**, run `supabase/v5.0-weekly-telemetry.sql` once in the Supabase SQL editor before deploying. In Resend, create a webhook for `https://www.polipol.it/api/webhooks/resend`, select the delivered, delivery delayed, failed, bounced, and suppressed email events, then copy its signing secret into Vercel as `RESEND_WEBHOOK_SECRET`. Redeploy after adding the variable.
 
 ## Security and data access notes
 
@@ -72,7 +74,9 @@ For the v3 branding/domain setup outside this repository:
 - Organizer link recovery is optional. If an organizer enters an email when creating a poll, `/recover` can email the matching private organizer links.
 - `/recover` always returns the same generic response for a valid email request, whether or not matching polls exist.
 - `/recover` is rate-limited in memory to reduce abuse, and it uses the server-only Supabase service role key plus Resend API key.
-- `/api/keepalive` only accepts Vercel Cron requests with `Authorization: Bearer CRON_SECRET`. It uses the service role key, reads only aggregate counts, and sends the weekly digest to `ADMIN_EMAIL`.
+- `/api/keepalive` only accepts Vercel Cron requests with `Authorization: Bearer CRON_SECRET`. It uses the service role key, reads only aggregate counts, and sends an Italian weekly usage and operations digest to `ADMIN_EMAIL`.
+- `telemetry_events` is private to the Supabase service role. It stores event categories, timestamps, optional poll IDs, and non-personal metadata; it does not store names, email addresses, organizer tokens, participant tokens, or IP addresses.
+- `/api/webhooks/resend` verifies Resend signatures with `RESEND_WEBHOOK_SECRET` before recording aggregate delivery outcomes.
 - Organizer downloads are served only by organizer-token-gated routes. Both routes support CSV by default or Excel with `format=xlsx`; the selected-slot route also supports a calendar file with `format=ics` after a slot has been confirmed:
   - `/api/events/[id]/export/all?token=...`
   - `/api/events/[id]/export/available?token=...`
@@ -106,6 +110,7 @@ For the v3 branding/domain setup outside this repository:
 - **v4.0.6** ensures recovery confirmations and emails use Italian for the Italian interface, with browser-language detection and an Italian fallback.
 - **v4.0.7** improves the Italian recovery confirmation message with clearer, privacy-preserving wording.
 - **v4.0.8** replaces the default 404 with a bilingual PoliPol page for invalid or deleted poll links.
+- **v5.0** redesigns the weekly digest with week-over-week usage metrics and adds private, data-minimised telemetry for application errors, email delivery outcomes, deletions, response submissions, and simple suspicious-poll signals.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit
@@ -114,4 +119,4 @@ This app uses ordinary Vercel serverless route handlers, Supabase Postgres, Rese
 
 ## Data privacy
 
-PoliPol stores organizer recovery emails, participant names, organizations, emails, and availability. v3.3 adds `/privacy` and `/cookies` pages written to support EU GDPR transparency and data-minimisation principles. The weekly admin digest contains aggregate counts only, not participant names, emails, organizations, or availability details. Organizers remain responsible for handling exported contact lists according to their institution's data protection policy, including GDPR obligations when respondents are in the EU.
+PoliPol stores organizer recovery emails, participant names, organizations, emails, and availability. The `/privacy` and `/cookies` pages support EU GDPR transparency and data-minimisation principles. The weekly admin digest contains aggregate counts only, not participant names, emails, organizations, or availability details. Private operational telemetry also excludes personal contact data, private tokens, and IP addresses. Organizers remain responsible for handling exported contact lists according to their institution's data protection policy, including GDPR obligations when respondents are in the EU.

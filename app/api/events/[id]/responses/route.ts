@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabase } from "../../../../../lib/supabase";
+import { recordAppError, recordTelemetry } from "../../../../../lib/telemetry";
 import {
   isUuid,
   isValidEmail,
@@ -45,6 +46,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     .maybeSingle();
 
   if (eventError) {
+    await recordAppError("/api/events/[id]/responses", "load_poll", id);
     return NextResponse.json({ error: eventError.message }, { status: 500 });
   }
 
@@ -68,8 +70,14 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   });
 
   if (error) {
+    await recordAppError("/api/events/[id]/responses", "submit_response", id);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  await recordTelemetry("response_submitted", {
+    pollId: id,
+    metadata: { slot_count: slotCount },
+  });
 
   return NextResponse.json({ ok: true });
 }
