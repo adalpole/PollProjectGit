@@ -113,6 +113,7 @@ For the v3 branding/domain setup outside this repository:
 - **v4.0.8** replaces the default 404 with a bilingual PoliPol page for invalid or deleted poll links.
 - **v5.0** redesigns the weekly digest with week-over-week usage metrics and adds private, data-minimised telemetry for application errors, email delivery outcomes, deletions, response submissions, and simple suspicious-poll signals.
 - **v5.1** detects the organizer's browser time zone, lets the organizer correct it, displays it to participants, and applies it to calendar downloads without storing IP addresses or geolocation.
+- **v5.1.1** gives the poll time zone a compact visual status panel with its UTC offset and privately compares it with each respondent's device time zone without storing or transmitting that device setting.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit

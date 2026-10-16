@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { formatSlot, getBestSlotIndex, getSlotAnswerCount } from "../../../../lib/format";
 import { localizeApiError, useLanguage } from "../../../../lib/i18n";
 import type { AvailabilityStatus, OrganizerEvent } from "../../../../lib/types";
+import { TimeZoneBanner } from "../../../time-zone-banner";
 
 export default function OrganizerView({
   event,
@@ -90,11 +91,7 @@ export default function OrganizerView({
       <h1 className="page-title" style={{ marginBottom: 16 }}>
         {event.title}
       </h1>
-      <p className="time-zone-note sans">
-        {event.time_zone
-          ? t("pollTimeZone", { timeZone: event.time_zone })
-          : t("timeZoneNotSpecified")}
-      </p>
+      <TimeZoneBanner timeZone={event.time_zone} slots={event.slots} />
 
       {recoveryEnabled ? (
         <p className="success-banner sans">

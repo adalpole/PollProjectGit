@@ -206,11 +206,108 @@ a {
   margin: 8px 0 0;
 }
 
-.time-zone-note {
-  color: var(--muted);
-  font-size: 12.5px;
-  line-height: 1.4;
+.time-zone-panel {
+  align-items: flex-start;
+  background: var(--accent-soft);
+  border: 1px solid var(--line-soft);
+  border-left: 4px solid var(--accent-strong);
+  border-radius: 4px;
+  display: flex;
+  gap: 11px;
   margin: -8px 0 20px;
+  padding: 12px 14px;
+}
+
+.time-zone-panel--control {
+  margin: 0;
+}
+
+.time-zone-panel[data-different="true"] {
+  border-left-color: var(--primary);
+}
+
+.time-zone-panel__icon {
+  align-items: center;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--primary);
+  display: inline-flex;
+  flex: 0 0 34px;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.time-zone-panel__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.time-zone-panel__label {
+  color: var(--muted);
+  display: block;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.35px;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+}
+
+.time-zone-panel__value {
+  color: var(--primary);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.time-zone-panel__offset {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--primary);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  margin-left: 8px;
+  padding: 4px 7px;
+  white-space: nowrap;
+}
+
+.time-zone-panel__detail,
+.time-zone-panel__privacy {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 5px 0 0;
+}
+
+.time-zone-panel__privacy {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.time-zone-panel__control-row {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.time-zone-panel__select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  color: var(--primary);
+  flex: 1 1 auto;
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 0;
+  outline: none;
+  padding: 4px 0 5px;
+}
+
+.time-zone-panel__select:focus {
+  border-bottom-color: var(--primary);
 }
 
 .privacy-hint {
@@ -1032,6 +1129,20 @@ a.button-secondary:hover {
 @media (max-width: 500px) {
   .shell {
     padding-inline: 14px;
+  }
+
+  .time-zone-panel__control-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .time-zone-panel__select {
+    width: 100%;
+  }
+
+  .time-zone-panel__offset {
+    margin-left: 0;
   }
 
   .slot-row {

@@ -1,9 +1,9 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { Globe2, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { localizeApiError, useLanguage } from "../lib/i18n";
-import { detectTimeZone, supportedTimeZones } from "../lib/time-zone";
+import { detectTimeZone, summarizeTimeZoneOffsets, supportedTimeZones } from "../lib/time-zone";
 import type { Slot } from "../lib/types";
 
 type EditableSlot = Slot & { id: string };
@@ -37,6 +37,10 @@ export default function HomePage() {
   const validSlots = useMemo(
     () => slots.filter((slot) => slot.date && slot.start && slot.end),
     [slots],
+  );
+  const timeZoneOffset = useMemo(
+    () => (timeZone ? summarizeTimeZoneOffsets(timeZone, validSlots) : ""),
+    [timeZone, validSlots],
   );
   const canCreate = title.trim().length > 0 && validSlots.length > 0 && Boolean(timeZone) && !saving;
 
@@ -131,21 +135,33 @@ export default function HomePage() {
 
       <div style={{ height: 24 }} />
 
-      <label className="field-label sans" htmlFor="time-zone">
-        {t("timeZone")}
-      </label>
-      <select
-        id="time-zone"
-        className="text-input sans"
-        value={timeZone}
-        onChange={(event) => setTimeZone(event.target.value)}
-      >
-        {!timeZone ? <option value="">{t("detectingTimeZone")}</option> : null}
-        {timeZones.map((zone) => (
-          <option key={zone} value={zone}>{zone}</option>
-        ))}
-      </select>
-      <p className="field-help sans">{t("timeZoneHelp")}</p>
+      <div className="time-zone-panel time-zone-panel--control sans">
+        <span className="time-zone-panel__icon" aria-hidden="true">
+          <Globe2 size={18} />
+        </span>
+        <div className="time-zone-panel__body">
+          <label className="time-zone-panel__label" htmlFor="time-zone">
+            {t("timeZone")}
+          </label>
+          <div className="time-zone-panel__control-row">
+            <select
+              id="time-zone"
+              className="time-zone-panel__select"
+              value={timeZone}
+              onChange={(event) => setTimeZone(event.target.value)}
+            >
+              {!timeZone ? <option value="">{t("detectingTimeZone")}</option> : null}
+              {timeZones.map((zone) => (
+                <option key={zone} value={zone}>{zone}</option>
+              ))}
+            </select>
+            {timeZoneOffset ? (
+              <span className="time-zone-panel__offset">{timeZoneOffset}</span>
+            ) : null}
+          </div>
+          <p className="time-zone-panel__detail">{t("timeZoneHelp")}</p>
+        </div>
+      </div>
 
       <div style={{ height: 24 }} />
 

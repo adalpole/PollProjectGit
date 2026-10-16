@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { formatSlot } from "../../../lib/format";
 import { localizeApiError, useLanguage } from "../../../lib/i18n";
 import { createEmptyResponseSummary, normalizePublicEvent } from "../../../lib/response-summary";
+import { TimeZoneBanner } from "../../time-zone-banner";
 import type {
   AvailabilityStatus,
   PublicEvent,
@@ -99,7 +100,7 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
         {t("addAvailability")}
       </p>
 
-      <TimeZoneNote timeZone={event.time_zone} />
+      <TimeZoneBanner timeZone={event.time_zone} slots={event.slots} compareDevice />
 
       <ConfirmedSlotNotice event={event} />
 
@@ -207,15 +208,6 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
         </p>
       ) : null}
     </section>
-  );
-}
-
-function TimeZoneNote({ timeZone }: { timeZone: string | null }) {
-  const { t } = useLanguage();
-  return (
-    <p className="time-zone-note sans">
-      {timeZone ? t("pollTimeZone", { timeZone }) : t("timeZoneNotSpecified")}
-    </p>
   );
 }
 
