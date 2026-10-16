@@ -6,6 +6,7 @@ type CalendarEventInput = {
   slot: Slot;
   publicUrl: string;
   language?: "en" | "it";
+  timeZone?: string | null;
 };
 
 function escapeIcsText(value: string) {
@@ -37,7 +38,14 @@ function toIcsLocalDateTime(date: string, time: string) {
   return `${date.replace(/-/g, "")}T${time.replace(":", "")}00`;
 }
 
-export function buildCalendarFile({ id, title, slot, publicUrl, language = "en" }: CalendarEventInput) {
+export function buildCalendarFile({
+  id,
+  title,
+  slot,
+  publicUrl,
+  language = "en",
+  timeZone,
+}: CalendarEventInput) {
   const description = [
     language === "it" ? "Fascia confermata da PoliPol." : "Confirmed slot from PoliPol.",
     "",
@@ -49,11 +57,12 @@ export function buildCalendarFile({ id, title, slot, publicUrl, language = "en" 
     "PRODID:-//PoliPol//Scheduling Poll//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
+    ...(timeZone ? [`X-WR-TIMEZONE:${timeZone}`] : []),
     "BEGIN:VEVENT",
     `UID:${escapeIcsText(`${id}-${slot.date}-${slot.start}@polipol.it`)}`,
     `DTSTAMP:${toIcsUtcDateTime(new Date())}`,
-    `DTSTART:${toIcsLocalDateTime(slot.date, slot.start)}`,
-    `DTEND:${toIcsLocalDateTime(slot.date, slot.end)}`,
+    `DTSTART${timeZone ? `;TZID=${timeZone}` : ""}:${toIcsLocalDateTime(slot.date, slot.start)}`,
+    `DTEND${timeZone ? `;TZID=${timeZone}` : ""}:${toIcsLocalDateTime(slot.date, slot.end)}`,
     `SUMMARY:${escapeIcsText(title)}`,
     `DESCRIPTION:${escapeIcsText(description)}`,
     `URL:${escapeIcsText(publicUrl)}`,

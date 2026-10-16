@@ -90,6 +90,11 @@ export default function OrganizerView({
       <h1 className="page-title" style={{ marginBottom: 16 }}>
         {event.title}
       </h1>
+      <p className="time-zone-note sans">
+        {event.time_zone
+          ? t("pollTimeZone", { timeZone: event.time_zone })
+          : t("timeZoneNotSpecified")}
+      </p>
 
       {recoveryEnabled ? (
         <p className="success-banner sans">

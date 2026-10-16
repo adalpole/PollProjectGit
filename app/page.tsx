@@ -1,8 +1,9 @@
 "use client";
 
 import { Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { localizeApiError, useLanguage } from "../lib/i18n";
+import { detectTimeZone, supportedTimeZones } from "../lib/time-zone";
 import type { Slot } from "../lib/types";
 
 type EditableSlot = Slot & { id: string };
@@ -28,15 +29,23 @@ export default function HomePage() {
   const { language, t } = useLanguage();
   const [title, setTitle] = useState("");
   const [organizerEmail, setOrganizerEmail] = useState("");
+  const [timeZone, setTimeZone] = useState("");
+  const [timeZones, setTimeZones] = useState<string[]>(["UTC"]);
   const [slots, setSlots] = useState<EditableSlot[]>([newSlot()]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-
   const validSlots = useMemo(
     () => slots.filter((slot) => slot.date && slot.start && slot.end),
     [slots],
   );
-  const canCreate = title.trim().length > 0 && validSlots.length > 0 && !saving;
+  const canCreate = title.trim().length > 0 && validSlots.length > 0 && Boolean(timeZone) && !saving;
+
+  useEffect(() => {
+    const detected = detectTimeZone() ?? "UTC";
+    const supported = supportedTimeZones();
+    setTimeZones(supported.includes(detected) ? supported : [detected, ...supported]);
+    setTimeZone(detected);
+  }, []);
 
   function addSlot() {
     setSlots((current) => [...current, newSlot()]);
@@ -65,6 +74,7 @@ export default function HomePage() {
         body: JSON.stringify({
           title: title.trim(),
           organizer_email: organizerEmail.trim() || null,
+          time_zone: timeZone,
           slots: validSlots.map(({ date, start, end }) => ({ date, start, end })),
         }),
       });
@@ -118,6 +128,24 @@ export default function HomePage() {
       <p className="field-help sans">
         {t("organizerEmailHelp")}
       </p>
+
+      <div style={{ height: 24 }} />
+
+      <label className="field-label sans" htmlFor="time-zone">
+        {t("timeZone")}
+      </label>
+      <select
+        id="time-zone"
+        className="text-input sans"
+        value={timeZone}
+        onChange={(event) => setTimeZone(event.target.value)}
+      >
+        {!timeZone ? <option value="">{t("detectingTimeZone")}</option> : null}
+        {timeZones.map((zone) => (
+          <option key={zone} value={zone}>{zone}</option>
+        ))}
+      </select>
+      <p className="field-help sans">{t("timeZoneHelp")}</p>
 
       <div style={{ height: 24 }} />
 

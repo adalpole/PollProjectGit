@@ -27,7 +27,7 @@ export async function loadPublicEvent(id: string): Promise<PublicEvent | null> {
 
   const { data: fallbackData, error: fallbackError } = await supabase
     .from("events")
-    .select("id,title,slots,confirmed_slot_index,created_at")
+    .select("id,title,slots,time_zone,confirmed_slot_index,created_at")
     .eq("id", id)
     .maybeSingle();
 

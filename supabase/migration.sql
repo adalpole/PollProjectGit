@@ -6,16 +6,37 @@ create table if not exists public.events (
   organizer_email text,
   title text not null,
   slots jsonb not null,
+  time_zone text,
   confirmed_slot_index integer,
   created_at timestamptz not null default now(),
   constraint events_slots_array check (jsonb_typeof(slots) = 'array'),
   constraint events_confirmed_slot_nonnegative check (
     confirmed_slot_index is null or confirmed_slot_index >= 0
+  ),
+  constraint events_time_zone_format check (
+    time_zone is null or (
+      char_length(time_zone) between 1 and 64
+      and time_zone ~ '^(UTC|[A-Za-z_+-]+(/[A-Za-z0-9_+.-]+)+)$'
+    )
   )
 );
 
 alter table public.events
   add column if not exists organizer_email text;
+
+alter table public.events
+  add column if not exists time_zone text;
+
+alter table public.events
+  drop constraint if exists events_time_zone_format;
+
+alter table public.events
+  add constraint events_time_zone_format check (
+    time_zone is null or (
+      char_length(time_zone) between 1 and 64
+      and time_zone ~ '^(UTC|[A-Za-z_+-]+(/[A-Za-z0-9_+.-]+)+)$'
+    )
+  );
 
 create index if not exists events_organizer_email_idx
   on public.events (lower(organizer_email))
@@ -117,7 +138,7 @@ revoke all on table public.telemetry_events from public;
 revoke all on table public.telemetry_events from anon, authenticated;
 
 grant usage on schema public to anon, authenticated;
-grant select (id, title, slots, confirmed_slot_index, created_at),
+grant select (id, title, slots, time_zone, confirmed_slot_index, created_at),
   insert (title, slots, organizer_email)
   on public.events to anon, authenticated;
 grant insert (event_id, participant_name, organization, email, availability),
@@ -157,6 +178,30 @@ begin
     btrim(p_title),
     p_slots,
     nullif(lower(btrim(p_organizer_email)), '')
+  )
+  returning events.id, events.organizer_token;
+end;
+$$;
+
+create or replace function public.create_event(
+  p_title text,
+  p_slots jsonb,
+  p_organizer_email text,
+  p_time_zone text
+)
+returns table(id uuid, organizer_token uuid)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return query
+  insert into public.events (title, slots, organizer_email, time_zone)
+  values (
+    btrim(p_title),
+    p_slots,
+    nullif(lower(btrim(p_organizer_email)), ''),
+    nullif(btrim(p_time_zone), '')
   )
   returning events.id, events.organizer_token;
 end;
@@ -211,6 +256,7 @@ begin
     'id', e.id,
     'title', e.title,
     'slots', e.slots,
+    'time_zone', e.time_zone,
     'confirmed_slot_index', e.confirmed_slot_index,
     'created_at', e.created_at,
     'responses', coalesce(
@@ -252,6 +298,7 @@ begin
     'id', e.id,
     'title', e.title,
     'slots', e.slots,
+    'time_zone', e.time_zone,
     'confirmed_slot_index', e.confirmed_slot_index,
     'created_at', e.created_at,
     'response_summary', jsonb_build_object(
@@ -350,6 +397,7 @@ $$;
 
 revoke execute on function public.create_event(text, jsonb) from public;
 revoke execute on function public.create_event(text, jsonb, text) from public;
+revoke execute on function public.create_event(text, jsonb, text, text) from public;
 revoke execute on function public.submit_response(uuid, text, text, text, jsonb) from public;
 revoke execute on function public.get_event_for_organizer(uuid, uuid) from public;
 revoke execute on function public.get_public_event(uuid) from public;
@@ -358,6 +406,7 @@ revoke execute on function public.delete_event(uuid, uuid) from public;
 
 grant execute on function public.create_event(text, jsonb) to anon, authenticated;
 grant execute on function public.create_event(text, jsonb, text) to anon, authenticated;
+grant execute on function public.create_event(text, jsonb, text, text) to anon, authenticated;
 grant execute on function public.submit_response(uuid, text, text, text, jsonb) to anon, authenticated;
 grant execute on function public.get_event_for_organizer(uuid, uuid) to anon, authenticated;
 grant execute on function public.get_public_event(uuid) to anon, authenticated;

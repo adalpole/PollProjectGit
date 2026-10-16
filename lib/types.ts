@@ -10,6 +10,7 @@ export type PublicEvent = {
   id: string;
   title: string;
   slots: Slot[];
+  time_zone: string | null;
   confirmed_slot_index: number | null;
   created_at?: string;
   response_summary?: PublicResponseSummary;

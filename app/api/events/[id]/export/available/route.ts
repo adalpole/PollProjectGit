@@ -48,6 +48,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       slot: selectedSlot,
       publicUrl,
       language,
+      timeZone: event.time_zone,
     });
 
     return icsDownloadResponse(`${filename}-calendar.ics`, calendar);

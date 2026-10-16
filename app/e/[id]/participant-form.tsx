@@ -99,6 +99,8 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
         {t("addAvailability")}
       </p>
 
+      <TimeZoneNote timeZone={event.time_zone} />
+
       <ConfirmedSlotNotice event={event} />
 
       <div className="respond-fields">
@@ -205,6 +207,15 @@ export default function ParticipantForm({ event }: { event: PublicEvent }) {
         </p>
       ) : null}
     </section>
+  );
+}
+
+function TimeZoneNote({ timeZone }: { timeZone: string | null }) {
+  const { t } = useLanguage();
+  return (
+    <p className="time-zone-note sans">
+      {timeZone ? t("pollTimeZone", { timeZone }) : t("timeZoneNotSpecified")}
+    </p>
   );
 }
 

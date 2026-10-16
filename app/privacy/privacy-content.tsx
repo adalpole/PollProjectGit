@@ -33,6 +33,7 @@ export function PrivacyContent() {
           <ul>
             <li>Email dell'organizzatore, solo se inserita per il recupero del link.</li>
             <li>Titolo, date e orari proposti, fascia finale selezionata e data di creazione.</li>
+            <li>Fuso orario scelto dall'organizzatore per interpretare correttamente gli orari.</li>
             <li>Organizzazione, email, nome facoltativo e disponibilità dei rispondenti.</li>
             <li>Conteggi aggregati anonimi mostrati ai rispondenti per ogni fascia proposta.</li>
             <li>
@@ -46,6 +47,7 @@ export function PrivacyContent() {
         <PolicySection title="Finalità">
           <ul>
             <li>Creare e gestire sondaggi di pianificazione.</li>
+            <li>Mostrare e inserire nel calendario gli orari nel fuso scelto dall'organizzatore.</li>
             <li>Raccogliere, aggiornare, mostrare ed esportare le risposte per l'organizzatore.</li>
             <li>Mostrare ai rispondenti i totali anonimi delle preferenze precedenti.</li>
             <li>Inviare via email i link privati quando viene richiesto il recupero.</li>
@@ -122,8 +124,8 @@ export function PrivacyContent() {
       </div>
 
       <PolicySection title="Who is involved"><p>PoliPol provides the scheduling tool. The organizer who creates and shares a poll decides why that poll is used and who is invited to answer it. For poll-specific questions, contact the organizer who sent you the link. For platform-level privacy requests, contact <a href="mailto:privacy@polipol.it">privacy@polipol.it</a>.</p></PolicySection>
-      <PolicySection title="Data collected"><ul><li>Organizer email, only if the organizer enters it for link recovery.</li><li>Poll title, proposed dates/times, selected final slot, and creation date.</li><li>Respondent organization, email, optional name, and availability choices.</li><li>Anonymous aggregate counts shown to later respondents for each proposed slot.</li><li>Minimal technical events for reliability and abuse prevention, such as error category, email delivery status, and poll ID. This telemetry does not include names, email addresses, private tokens, or IP addresses.</li></ul></PolicySection>
-      <PolicySection title="Purposes"><ul><li>Create and manage scheduling polls.</li><li>Collect, update, display, and export responses for the organizer.</li><li>Show respondents anonymous preference totals from previous responses.</li><li>Email private organizer links when link recovery is requested.</li><li>Produce a weekly administrative digest containing aggregate data only.</li><li>Maintain basic security, reliability, and abuse prevention for the service.</li></ul></PolicySection>
+      <PolicySection title="Data collected"><ul><li>Organizer email, only if the organizer enters it for link recovery.</li><li>Poll title, proposed dates/times, selected final slot, and creation date.</li><li>The time zone selected by the organizer to interpret poll times correctly.</li><li>Respondent organization, email, optional name, and availability choices.</li><li>Anonymous aggregate counts shown to later respondents for each proposed slot.</li><li>Minimal technical events for reliability and abuse prevention, such as error category, email delivery status, and poll ID. This telemetry does not include names, email addresses, private tokens, or IP addresses.</li></ul></PolicySection>
+      <PolicySection title="Purposes"><ul><li>Create and manage scheduling polls.</li><li>Display and add times to calendars using the organizer's selected time zone.</li><li>Collect, update, display, and export responses for the organizer.</li><li>Show respondents anonymous preference totals from previous responses.</li><li>Email private organizer links when link recovery is requested.</li><li>Produce a weekly administrative digest containing aggregate data only.</li><li>Maintain basic security, reliability, and abuse prevention for the service.</li></ul></PolicySection>
       <PolicySection title="Legal basis"><p>The legal basis can depend on the organizer's context, for example an institutional task, legitimate interest, contract-related coordination, or consent where the organizer chooses to rely on consent. PoliPol is a scheduling tool and does not decide the organizer's legal basis. Platform-level processing is limited to providing, securing, and maintaining the requested scheduling service.</p></PolicySection>
       <PolicySection title="Who can see data"><ul><li>Organizers with the private organizer link can see individual responses and exports.</li><li>Respondents with the public poll link can see only anonymous per-slot totals.</li><li>PoliPol does not intentionally publish respondent names, emails, or organizations.</li></ul></PolicySection>
       <PolicySection title="Processors"><p>PoliPol uses third-party infrastructure to operate the service:</p><ul><li>Vercel for web hosting and serverless execution.</li><li>Supabase for database storage.</li><li>Resend for recovery emails and administrative digests.</li></ul></PolicySection>

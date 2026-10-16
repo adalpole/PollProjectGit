@@ -66,6 +66,7 @@ For the v3 branding/domain setup outside this repository:
 - For **v3.3**, configure or forward `privacy@polipol.it`, or edit the policy pages to use a different monitored privacy contact.
 - For **v3.5**, run `supabase/v3.5-keepalive-digest.sql` once in the Supabase SQL editor before or soon after deploying. Then add `ADMIN_EMAIL` and `CRON_SECRET` in Vercel Project Settings -> Environment Variables. The daily cron schedule is defined in `vercel.json`.
 - For **v5.0**, run `supabase/v5.0-weekly-telemetry.sql` once in the Supabase SQL editor before deploying. In Resend, create a webhook for `https://www.polipol.it/api/webhooks/resend`, select the delivered, delivery delayed, failed, bounced, and suppressed email events, then copy its signing secret into Vercel as `RESEND_WEBHOOK_SECRET`. Redeploy after adding the variable.
+- For **v5.1**, run `supabase/v5.1-poll-time-zone.sql` once in the Supabase SQL editor before deploying. New polls store the organizer-selected IANA time zone; existing polls remain unchanged with no inferred time zone.
 
 ## Security and data access notes
 
@@ -111,6 +112,7 @@ For the v3 branding/domain setup outside this repository:
 - **v4.0.7** improves the Italian recovery confirmation message with clearer, privacy-preserving wording.
 - **v4.0.8** replaces the default 404 with a bilingual PoliPol page for invalid or deleted poll links.
 - **v5.0** redesigns the weekly digest with week-over-week usage metrics and adds private, data-minimised telemetry for application errors, email delivery outcomes, deletions, response submissions, and simple suspicious-poll signals.
+- **v5.1** detects the organizer's browser time zone, lets the organizer correct it, displays it to participants, and applies it to calendar downloads without storing IP addresses or geolocation.
 - **Future candidate**: add a small organizer dashboard if link recovery is not enough, while keeping participant access account-free.
 
 ## Free tier fit
